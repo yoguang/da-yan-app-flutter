@@ -1,0 +1,63 @@
+PODS:
+  - AMap3DMap (9.7.0):
+    - AMapFoundation (>= 1.8.0)
+  - AMapFoundation (1.8.2)
+  - AMapLocation (2.10.0):
+    - AMapFoundation (>= 1.8.0)
+  - fl_amap_map (0.0.1):
+    - AMap3DMap
+    - AMapLocation
+    - fl_channel
+    - Flutter
+  - fl_channel (0.0.1):
+    - Flutter
+  - Flutter (1.0.0)
+  - flutter_blue_plus (0.0.1):
+    - Flutter
+  - geolocator_apple (1.2.0):
+    - Flutter
+  - permission_handler_apple (9.1.1):
+    - Flutter
+
+DEPENDENCIES:
+  - fl_amap_map (from `.symlinks/plugins/fl_amap_map/ios`)
+  - fl_channel (from `.symlinks/plugins/fl_channel/ios`)
+  - Flutter (from `Flutter`)
+  - flutter_blue_plus (from `.symlinks/plugins/flutter_blue_plus/ios`)
+  - geolocator_apple (from `.symlinks/plugins/geolocator_apple/ios`)
+  - permission_handler_apple (from `.symlinks/plugins/permission_handler_apple/ios`)
+
+SPEC REPOS:
+  trunk:
+    - AMap3DMap
+    - AMapFoundation
+    - AMapLocation
+
+EXTERNAL SOURCES:
+  fl_amap_map:
+    :path: ".symlinks/plugins/fl_amap_map/ios"
+  fl_channel:
+    :path: ".symlinks/plugins/fl_channel/ios"
+  Flutter:
+    :path: Flutter
+  flutter_blue_plus:
+    :path: ".symlinks/plugins/flutter_blue_plus/ios"
+  geolocator_apple:
+    :path: ".symlinks/plugins/geolocator_apple/ios"
+  permission_handler_apple:
+    :path: ".symlinks/plugins/permission_handler_apple/ios"
+
+SPEC CHECKSUMS:
+  AMap3DMap: dce25dd3e51e6b92109caa7d0c97fc6055830fb3
+  AMapFoundation: 9885c48fc3a78fdfb84a0299a2293e56ea3c9fec
+  AMapLocation: 5248aec2455ebb5d104b367813c946430a2ee033
+  fl_amap_map: 8db33b344ab0a43f0c61d97996fae83c46c46255
+  fl_channel: d1b1ae03e0aa32702f1c137a2835761b32d35646
+  Flutter: f04841e97a9d0b0a8025694d0796dd46242b2854
+  flutter_blue_plus: 4837da7d00cf5d441fdd6635b3a57f936778ea96
+  geolocator_apple: cc556e6844d508c95df1e87e3ea6fa4e58c50401
+  permission_handler_apple: e76247795d700c14ea09e3a2d8855d41ee80a2e6
+
+PODFILE CHECKSUM: 70d9d25280d0dd177a5f637cdb0f0b0b12c6a189
+
+COCOAPODS: 1.11.3

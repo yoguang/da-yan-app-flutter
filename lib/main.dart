@@ -4,7 +4,9 @@ import './pages/home_page.dart';
 import './pages/community_page.dart';
 import './pages/my_page.dart';
 import './pages/bottom_sheet_view.dart';
-import './widgets/map_view.dart';
+import './widgets/location.dart';
+import './pages/bluetooth_view.dart';
+import './pages/device_finder_view.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -49,9 +51,9 @@ class _MyHomePageState extends State<MyHomePage> {
   int _currentPageIndex = 0;
 
   List<Widget> tabPages = const [
+    BluetoothView(),
     HomePage(),
-    CommunityPage(),
-    MapView(),
+    AMapLocationPage(),
   ];
 
   List<BottomNavigationBarItem> bottomNavBarItems = const [

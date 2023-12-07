@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_blue_plus/flutter_blue_plus.dart';
+import '../pages/device_finder_view.dart';
 
 class Device {
   late String deviceId;
@@ -41,83 +43,97 @@ class Device {
 class DeviceListWidget extends StatefulWidget {
   const DeviceListWidget({super.key, required this.devicesData});
   final List<Device> devicesData;
-  // void onTap = (Device device) => {};
 
   @override
   State<DeviceListWidget> createState() => _DeviceListWidgetState();
 }
 
 class _DeviceListWidgetState extends State<DeviceListWidget> {
-  void _handleOnTap(Device device) {
-    print(device.toJson());
-    // this.onTap(device);
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const FullScreenPage()),
-    );
-  }
+  final List<BluetoothDevice> _devices = [
+    BluetoothDevice(remoteId: const DeviceIdentifier('5B:0D:EF:F2:2D:84')),
+  ];
 
   @override
   void initState() {
     super.initState();
-    print('devicesData: ');
-    print(widget.devicesData);
+  }
+
+  void handleOnTap(BluetoothDevice device) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => DeviceFinderView(device: device),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
+    return const DeviceInfoView();
     return Column(
       children: [
-        ...widget.devicesData.map((Device device) => ListTile(
-              leading: const CircleAvatar(
-                child: Icon(Icons.backpack),
-              ),
-              title: Text(device.name),
-              subtitle: Text(device.address),
-              trailing: Text(device.distance),
-              onTap: () => {_handleOnTap(device)},
-            )),
-        const ListTile(
-          leading: CircleAvatar(
-            child: Icon(Icons.backpack),
+        ..._devices.map(
+          (BluetoothDevice device) => ListTile(
+            leading: const CircleAvatar(
+              child: Icon(Icons.bluetooth),
+            ),
+            title: Text(device.platformName),
+            subtitle: Text(device.mtuNow.toString()),
+            trailing: Text(device.isConnected.toString()),
+            onTap: () => {handleOnTap(device)},
           ),
-          title: Text('Map'),
-          subtitle: Text('subTitle'),
-          trailing: Text('10米'),
-        ),
-        const ListTile(
-          leading: CircleAvatar(
-            child: Icon(Icons.pedal_bike),
-          ),
-          title: Text('Album'),
-          subtitle: Text('subTitle'),
-        ),
-        const ListTile(
-          leading: CircleAvatar(
-            child: Icon(Icons.account_balance_wallet),
-          ),
-          title: Text('Phone'),
-          subtitle: Text('subTitle'),
         ),
       ],
     );
   }
 }
 
-class FullScreenPage extends StatelessWidget {
-  const FullScreenPage({super.key});
+class DeviceInfoView extends StatefulWidget {
+  const DeviceInfoView({super.key});
 
   @override
+  State<DeviceInfoView> createState() => _DeviceInfoViewState();
+}
+
+class _DeviceInfoViewState extends State<DeviceInfoView> {
+  @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        Scaffold(
-          appBar: AppBar(title: const Text('全屏页面')),
-          body: const Center(
-            child: Text('这是一个全屏的新页面，覆盖在 bottomNavigationBar 之上'),
+    return const Padding(
+      padding: EdgeInsets.fromLTRB(15, 0, 15, 0),
+      child: Column(
+        children: [
+          // 设备基本信息
+          SizedBox(
+            width: double.infinity,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '我的iPhone',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                Text(
+                  '中国浙江省杭州市西湖区莲花街',
+                  style: TextStyle(fontSize: 14),
+                ),
+                Text(
+                  '1分钟前',
+                  style: TextStyle(fontSize: 14),
+                ),
+              ],
+            ),
           ),
-        ),
-      ],
+          // 操作按钮
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text('播放'),
+              Text('查找'),
+            ],
+          ),
+        ],
+      ),
     );
   }
 }

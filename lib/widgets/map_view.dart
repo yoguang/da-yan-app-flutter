@@ -24,12 +24,12 @@ class _MapViewState extends State<MapView> {
       child: AMapView(
         options: const AMapOptions(
           mapType: MapType.standard,
-          showCompass: true,
-          showMapText: true,
+          showCompass: false,
           showTraffic: false,
+          showScale: false,
+          showIndoorMap: false,
           showUserLocation: true,
-          showUserLocationButton: false,
-          latLng: LatLng(31.271689, 121.106997),
+          latLng: LatLng(30.271689, 120.106997),
         ),
         onCreateController: (AMapController controller) {
           this.controller = controller;
@@ -58,7 +58,7 @@ class _MapViewState extends State<MapView> {
 Future<bool> getPermission(Permission permission) async {
   final PermissionStatus status = await permission.request();
   if (!status.isGranted) {
-    await openAppSettings();
+    // await openAppSettings();
     return await permission.request().isGranted;
   }
   return status.isGranted;

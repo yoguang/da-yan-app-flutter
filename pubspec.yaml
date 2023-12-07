@@ -42,6 +42,7 @@ dependencies:
   fl_amap_map:
     path: /Users/wyg/Flutter/flutter_plugins/fl_amap/fl_amap_map
   permission_handler: ^11.0.1
+  flutter_blue_plus: ^1.30.3
 
 dev_dependencies:
   flutter_test:

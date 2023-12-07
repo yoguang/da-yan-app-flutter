@@ -53,12 +53,12 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       body: const Center(
         child: Center(
-          child: AMapLocationPage(),
+          child: MapView(),
         ),
       ),
       bottomSheet: InteractiveBottomSheet(
         options: const InteractiveBottomSheetOptions(
-          maxSize: 0.9,
+          maxSize: 0.93,
           backgroundColor: Colors.white,
           snapList: [0.25, 0.5],
         ),
@@ -71,10 +71,7 @@ class _HomePageState extends State<HomePage> {
           indicatorHeight: 5, // 指示器高度
           indicatorRadius: 5, // 指示器圆角
         ),
-        child: Padding(
-          padding: const EdgeInsets.only(left: 30),
-          child: DeviceListWidget(devicesData: data),
-        ),
+        child: DeviceListWidget(devicesData: data),
       ),
     );
   }
