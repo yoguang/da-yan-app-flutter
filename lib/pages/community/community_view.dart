@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import './location.dart';
 
 class CommunityPage extends StatefulWidget {
   const CommunityPage({super.key});
@@ -17,7 +16,7 @@ class _CommunityPageState extends State<CommunityPage> {
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
       ),
       body: const Center(
-        child: LocationWidget(),
+        child: Text('社区'),
       ),
     );
   }
