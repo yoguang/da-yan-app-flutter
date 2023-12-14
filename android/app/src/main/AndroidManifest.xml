@@ -23,7 +23,7 @@
 
     <!-- 添加 android:allowNativeHeapPointerTagging="false" 为了解决报错：Pointer tag for 0x741dd1ef10 was truncated, see 'https://source.android.com/devices/tech/debug/tagged-pointers'. -->
     <application
-        android:label="da_yan_app"
+        android:label="大雁"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
         android:allowNativeHeapPointerTagging="false">
