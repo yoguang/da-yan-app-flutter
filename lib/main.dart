@@ -61,7 +61,8 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
-  late LocationModel? _locationModel;
+  late PageController _pageController;
+  late LocationModel _locationModel;
   int _currentPageIndex = 0;
   List<Widget> tabPages = const [
     HomeView(),
@@ -89,8 +90,41 @@ class _MainPageState extends State<MainPage> {
   void initState() {
     super.initState();
     _locationModel = Provider.of<LocationModel>(context, listen: false);
+    _pageController =
+        PageController(initialPage: _currentPageIndex, keepPage: true);
     FlutterNativeSplash.remove();
     initLocation();
+  }
+
+  @override
+  void dispose() {
+    _locationModel.dispose();
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Center(
+        child: PageView(
+          physics: const NeverScrollableScrollPhysics(),
+          controller: _pageController,
+          children: tabPages,
+        ),
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        type: BottomNavigationBarType.fixed,
+        showUnselectedLabels: true,
+        unselectedItemColor: Theme.of(context).unselectedWidgetColor,
+        selectedItemColor: Theme.of(context).primaryColor,
+        unselectedLabelStyle:
+            TextStyle(color: Theme.of(context).unselectedWidgetColor),
+        items: bottomNavBarItems,
+        currentIndex: _currentPageIndex,
+        onTap: _bottomNavBarOnTap,
+      ),
+    );
   }
 
   Future<bool> getPermission(Permission permission) async {
@@ -115,7 +149,7 @@ class _MainPageState extends State<MainPage> {
     final location = await FlAMapLocation().getLocation(true);
     debugPrint('getLocation===============>: ${location?.toMap()}');
     if (location != null) {
-      _locationModel?.fromMap(location.toMap());
+      _locationModel.fromMap(location.toMap());
     }
   }
 
@@ -138,26 +172,7 @@ class _MainPageState extends State<MainPage> {
   void _bottomNavBarOnTap(int index) {
     setState(() {
       _currentPageIndex = index;
+      _pageController.jumpToPage(index);
     });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: tabPages[_currentPageIndex],
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-        showUnselectedLabels: true,
-        unselectedItemColor: Theme.of(context).unselectedWidgetColor,
-        selectedItemColor: Theme.of(context).primaryColor,
-        unselectedLabelStyle:
-            TextStyle(color: Theme.of(context).unselectedWidgetColor),
-        items: bottomNavBarItems,
-        currentIndex: _currentPageIndex,
-        onTap: _bottomNavBarOnTap,
-      ),
-    );
   }
 }

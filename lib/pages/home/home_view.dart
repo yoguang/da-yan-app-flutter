@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:snapping_bottom_sheet/snapping_bottom_sheet.dart';
 
@@ -13,10 +15,14 @@ class HomeView extends StatefulWidget {
   State<HomeView> createState() => _HomeViewState();
 }
 
-class _HomeViewState extends State<HomeView> {
+class _HomeViewState extends State<HomeView>
+    with AutomaticKeepAliveClientMixin {
   List<Device> data = [];
   late final LocalStorage localStorage = LocalStorage();
   SheetController controller = SheetController();
+
+  @override
+  bool get wantKeepAlive => true;
 
   @override
   void initState() {
@@ -26,6 +32,7 @@ class _HomeViewState extends State<HomeView> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return Scaffold(
       body: SafeArea(
         child: Column(
@@ -42,14 +49,14 @@ class _HomeViewState extends State<HomeView> {
   Widget buildSheet() {
     return SnappingBottomSheet(
       controller: controller,
-      color: Colors.white,
-      shadowColor: Colors.black26,
+      color: Color.fromARGB(125, 255, 255, 255),
+      shadowColor: Colors.transparent,
       elevation: 12,
       cornerRadius: 16,
-      cornerRadiusOnFullscreen: 0.0,
+      cornerRadiusOnFullscreen: 16,
       closeOnBackdropTap: false,
       closeOnBackButtonPressed: false,
-      addTopViewPaddingOnFullscreen: true,
+      addTopViewPaddingOnFullscreen: false,
       isBackdropInteractable: false,
       snapSpec: SnapSpec(
         snap: true,
@@ -57,7 +64,7 @@ class _HomeViewState extends State<HomeView> {
         snappings: const [
           SnapSpec.headerFooterSnap,
           0.5,
-          SnapSpec.expanded,
+          0.99,
         ],
         onSnap: (state, snap) {
           debugPrint('Snapped to $snap');
@@ -95,7 +102,7 @@ class _HomeViewState extends State<HomeView> {
               backgroundColor: Colors.white,
               onPressed: () {},
               child: const Icon(
-                Icons.podcasts_sharp,
+                Icons.my_location,
                 color: Colors.blue,
               ),
             ),
@@ -107,7 +114,7 @@ class _HomeViewState extends State<HomeView> {
 
   Widget buildHeader(BuildContext context, SheetState state) {
     return Container(
-      color: Colors.white,
+      // color: Colors.transparent,
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -134,9 +141,9 @@ class _HomeViewState extends State<HomeView> {
                   localStorage.set('token', '12345665432');
                   await showBottomSheetDialog(context);
                 },
-                icon: const Icon(
+                icon: Icon(
                   Icons.add,
-                  color: Colors.blue,
+                  color: Theme.of(context).primaryColor,
                 ),
                 iconSize: 28,
               ),
@@ -253,9 +260,16 @@ Widget buildInfiniteChild(
   ScrollController controller,
   SheetState state,
 ) {
-  return SingleChildScrollView(
-    controller: controller,
-    child: const DeviceListWidget(devicesData: []),
+  // return SingleChildScrollView(
+  //   controller: controller,
+  //   child: const DeviceListWidget(devicesData: []),
+  // );
+  return BackdropFilter(
+    filter: ImageFilter.blur(sigmaX: 22, sigmaY: 22),
+    child: SingleChildScrollView(
+      controller: controller,
+      child: const DeviceListWidget(devicesData: []),
+    ),
   );
 }
 
