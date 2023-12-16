@@ -17,7 +17,10 @@ class LocalStorage {
 
   set<T>(String key, T value) {
     String type = value.runtimeType.toString();
-
+    if (type.contains('_Map')) {
+      setMap(key, value as Map);
+      return;
+    }
     switch (type) {
       case "String":
         setString(key, value as String);

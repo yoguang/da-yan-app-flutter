@@ -8,9 +8,9 @@ import 'device_finder_view.dart';
 
 class DeviceInfoView extends StatefulWidget {
   final BluetoothDevice device;
-  final VoidCallback onDiscover;
+  final VoidCallback onClose;
   const DeviceInfoView(
-      {super.key, required this.device, required this.onDiscover});
+      {super.key, required this.device, required this.onClose});
 
   @override
   State<DeviceInfoView> createState() => _DeviceInfoViewState();
@@ -76,7 +76,7 @@ class _DeviceInfoViewState extends State<DeviceInfoView> {
                       ),
                       IconButton(
                         onPressed: () {
-                          widget.onDiscover();
+                          widget.onClose();
                         },
                         icon: Icon(
                           CupertinoIcons.clear_circled_solid,

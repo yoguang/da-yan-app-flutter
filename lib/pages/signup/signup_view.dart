@@ -1,8 +1,12 @@
+import 'package:da_yan_app/utils/local_storage.dart';
 import 'package:flutterflow_ui/flutterflow_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '/pages/login/login_view.dart' show LoginView;
+import '/http/api.dart';
+import '/main.dart' show MainPage;
+
 import 'signup_model.dart';
 export 'signup_view.dart';
 
@@ -50,7 +54,7 @@ class _SignUpViewState extends State<SignUpView> {
 
     return Scaffold(
       key: scaffoldKey,
-      backgroundColor: Color(0xFF4B39EF),
+      backgroundColor: const Color(0xFF4B39EF),
       body: Container(
         width: MediaQuery.sizeOf(context).width,
         height: MediaQuery.sizeOf(context).height * 1,
@@ -71,14 +75,14 @@ class _SignUpViewState extends State<SignUpView> {
               height: 450,
               decoration: BoxDecoration(
                 color: FlutterFlowTheme.of(context).secondaryBackground,
-                boxShadow: [
+                boxShadow: const [
                   BoxShadow(
                     blurRadius: 7,
                     color: Color(0x4D090F13),
                     offset: Offset(0, 3),
                   )
                 ],
-                borderRadius: BorderRadius.only(
+                borderRadius: const BorderRadius.only(
                   bottomLeft: Radius.circular(16),
                   bottomRight: Radius.circular(16),
                   topLeft: Radius.circular(0),
@@ -86,51 +90,53 @@ class _SignUpViewState extends State<SignUpView> {
                 ),
               ),
               child: Padding(
-                padding: EdgeInsetsDirectional.fromSTEB(20, 0, 20, 0),
+                padding: const EdgeInsetsDirectional.fromSTEB(20, 0, 20, 0),
                 child: SingleChildScrollView(
                   child: Column(
                     mainAxisSize: MainAxisSize.max,
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      Padding(
+                      const Padding(
                         padding: EdgeInsetsDirectional.fromSTEB(0, 56, 0, 0),
                         child: Row(
                           mainAxisSize: MainAxisSize.max,
                           children: [
-                            if (!(Theme.of(context).brightness ==
-                                Brightness.dark))
-                              Image.asset(
-                                'assets/images/logoUpHome_dark@3x.png',
-                                width: 200,
-                                height: 60,
-                                fit: BoxFit.fitWidth,
-                              ),
-                            if (Theme.of(context).brightness == Brightness.dark)
-                              Image.asset(
-                                'assets/images/logoUpHome@3x.png',
-                                width: 200,
-                                height: 60,
-                                fit: BoxFit.fitWidth,
-                              ),
+                            // if (!(Theme.of(context).brightness ==
+                            //     Brightness.dark))
+                            //   Image.asset(
+                            //     'assets/images/logoUpHome_dark@3x.png',
+                            //     width: 200,
+                            //     height: 60,
+                            //     fit: BoxFit.fitWidth,
+                            //   ),
+                            // if (Theme.of(context).brightness == Brightness.dark)
+                            //   Image.asset(
+                            //     'assets/images/logoUpHome@3x.png',
+                            //     width: 200,
+                            //     height: 60,
+                            //     fit: BoxFit.fitWidth,
+                            //   ),
                           ],
                         ),
                       ),
                       Padding(
-                        padding: EdgeInsetsDirectional.fromSTEB(0, 16, 0, 4),
+                        padding:
+                            const EdgeInsetsDirectional.fromSTEB(0, 16, 0, 4),
                         child: Row(
                           mainAxisSize: MainAxisSize.max,
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
                             Text(
-                              'Get Started Below,',
+                              '开始注册,',
                               style: FlutterFlowTheme.of(context).displaySmall,
                             ),
                           ],
                         ),
                       ),
                       Padding(
-                        padding: EdgeInsetsDirectional.fromSTEB(0, 16, 0, 0),
+                        padding:
+                            const EdgeInsetsDirectional.fromSTEB(0, 16, 0, 0),
                         child: Row(
                           mainAxisSize: MainAxisSize.max,
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -141,36 +147,35 @@ class _SignUpViewState extends State<SignUpView> {
                                 focusNode: _model.emailAddressFocusNode,
                                 obscureText: false,
                                 decoration: InputDecoration(
-                                  labelText: 'Email Address',
+                                  labelText: '账号',
                                   labelStyle:
                                       FlutterFlowTheme.of(context).bodyMedium,
-                                  hintText: 'Enter your email here...',
+                                  hintText: '在此输入您的账号...',
                                   hintStyle:
                                       FlutterFlowTheme.of(context).bodyMedium,
                                   enabledBorder: OutlineInputBorder(
-                                    borderSide: BorderSide(
-                                      color: FlutterFlowTheme.of(context)
-                                          .lineColor,
+                                    borderSide: const BorderSide(
+                                      color: Color(0xFFE0E3E7),
                                       width: 2,
                                     ),
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                   focusedBorder: OutlineInputBorder(
-                                    borderSide: BorderSide(
-                                      color: Color(0x00000000),
+                                    borderSide: const BorderSide(
+                                      color: Color(0xFFE0E3E7),
                                       width: 2,
                                     ),
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                   errorBorder: OutlineInputBorder(
-                                    borderSide: BorderSide(
+                                    borderSide: const BorderSide(
                                       color: Color(0x00000000),
                                       width: 2,
                                     ),
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                   focusedErrorBorder: OutlineInputBorder(
-                                    borderSide: BorderSide(
+                                    borderSide: const BorderSide(
                                       color: Color(0x00000000),
                                       width: 2,
                                     ),
@@ -180,7 +185,7 @@ class _SignUpViewState extends State<SignUpView> {
                                   fillColor: FlutterFlowTheme.of(context)
                                       .secondaryBackground,
                                   contentPadding:
-                                      EdgeInsetsDirectional.fromSTEB(
+                                      const EdgeInsetsDirectional.fromSTEB(
                                           16, 24, 0, 24),
                                 ),
                                 style: FlutterFlowTheme.of(context).bodySmall,
@@ -193,7 +198,8 @@ class _SignUpViewState extends State<SignUpView> {
                         ),
                       ),
                       Padding(
-                        padding: EdgeInsetsDirectional.fromSTEB(0, 16, 0, 0),
+                        padding:
+                            const EdgeInsetsDirectional.fromSTEB(0, 16, 0, 0),
                         child: Row(
                           mainAxisSize: MainAxisSize.max,
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -204,10 +210,10 @@ class _SignUpViewState extends State<SignUpView> {
                                 focusNode: _model.passwordFocusNode,
                                 obscureText: !_model.passwordVisibility,
                                 decoration: InputDecoration(
-                                  labelText: 'Password',
+                                  labelText: '密码',
                                   labelStyle:
                                       FlutterFlowTheme.of(context).bodyMedium,
-                                  hintText: 'Enter your email here...',
+                                  hintText: '在此输入你的密码...',
                                   hintStyle:
                                       FlutterFlowTheme.of(context).bodyMedium,
                                   enabledBorder: OutlineInputBorder(
@@ -220,21 +226,22 @@ class _SignUpViewState extends State<SignUpView> {
                                   ),
                                   focusedBorder: OutlineInputBorder(
                                     borderSide: BorderSide(
-                                      color: Color(0x00000000),
+                                      color: FlutterFlowTheme.of(context)
+                                          .lineColor,
                                       width: 2,
                                     ),
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                   errorBorder: OutlineInputBorder(
                                     borderSide: BorderSide(
-                                      color: Color(0x00000000),
+                                      color: FlutterFlowTheme.of(context).error,
                                       width: 2,
                                     ),
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                   focusedErrorBorder: OutlineInputBorder(
                                     borderSide: BorderSide(
-                                      color: Color(0x00000000),
+                                      color: FlutterFlowTheme.of(context).error,
                                       width: 2,
                                     ),
                                     borderRadius: BorderRadius.circular(8),
@@ -243,7 +250,7 @@ class _SignUpViewState extends State<SignUpView> {
                                   fillColor: FlutterFlowTheme.of(context)
                                       .secondaryBackground,
                                   contentPadding:
-                                      EdgeInsetsDirectional.fromSTEB(
+                                      const EdgeInsetsDirectional.fromSTEB(
                                           16, 24, 24, 24),
                                   suffixIcon: InkWell(
                                     onTap: () => setState(
@@ -255,7 +262,7 @@ class _SignUpViewState extends State<SignUpView> {
                                       _model.passwordVisibility
                                           ? Icons.visibility_outlined
                                           : Icons.visibility_off_outlined,
-                                      color: Color(0xFF95A1AC),
+                                      color: const Color(0xFF95A1AC),
                                       size: 22,
                                     ),
                                   ),
@@ -269,41 +276,51 @@ class _SignUpViewState extends State<SignUpView> {
                         ),
                       ),
                       Padding(
-                        padding: EdgeInsetsDirectional.fromSTEB(0, 24, 0, 0),
+                        padding:
+                            const EdgeInsetsDirectional.fromSTEB(0, 24, 0, 0),
                         child: Row(
                           mainAxisSize: MainAxisSize.max,
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
                             Padding(
-                              padding:
-                                  EdgeInsetsDirectional.fromSTEB(0, 0, 4, 0),
+                              padding: const EdgeInsetsDirectional.fromSTEB(
+                                  0, 0, 4, 0),
                               child: FFButtonWidget(
                                 onPressed: () async {
-                                  // final user =
-                                  //     await authManager.createAccountWithEmail(
-                                  //   context,
-                                  //   _model.emailAddressController.text,
-                                  //   _model.passwordController.text,
-                                  // );
-                                  // if (user == null) {
-                                  //   return;
-                                  // }
+                                  final result = await Api.signup({
+                                    'account':
+                                        _model.emailAddressController.text,
+                                    'password': _model.passwordController.text,
+                                  });
+                                  if (!result['success']) return;
 
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => const LoginView(),
-                                    ),
-                                  );
+                                  final user = result['data'];
+                                  final storage = LocalStorage();
+                                  storage.set(
+                                      'accessToken', user['accessToken']);
+                                  storage.set('user', user);
+                                  debugPrint('创建账号：$user');
+                                  if (user == null) {
+                                    return;
+                                  }
+                                  if (context.mounted) {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => const MainPage(),
+                                      ),
+                                    );
+                                  }
                                 },
-                                text: 'Create Account',
+                                text: '注册',
                                 options: FFButtonOptions(
-                                  width: 230,
+                                  width: 148,
                                   height: 50,
-                                  padding: EdgeInsetsDirectional.fromSTEB(
+                                  padding: const EdgeInsetsDirectional.fromSTEB(
                                       0, 0, 0, 0),
-                                  iconPadding: EdgeInsetsDirectional.fromSTEB(
-                                      0, 0, 0, 0),
+                                  iconPadding:
+                                      const EdgeInsetsDirectional.fromSTEB(
+                                          0, 0, 0, 0),
                                   color: FlutterFlowTheme.of(context).primary,
                                   textStyle: FlutterFlowTheme.of(context)
                                       .titleMedium
@@ -314,7 +331,7 @@ class _SignUpViewState extends State<SignUpView> {
                                         fontWeight: FontWeight.bold,
                                       ),
                                   elevation: 3,
-                                  borderSide: BorderSide(
+                                  borderSide: const BorderSide(
                                     color: Colors.transparent,
                                     width: 1,
                                   ),
@@ -326,16 +343,17 @@ class _SignUpViewState extends State<SignUpView> {
                         ),
                       ),
                       Padding(
-                        padding: EdgeInsetsDirectional.fromSTEB(0, 16, 0, 24),
+                        padding:
+                            const EdgeInsetsDirectional.fromSTEB(0, 16, 0, 24),
                         child: Row(
                           mainAxisSize: MainAxisSize.max,
-                          mainAxisAlignment: MainAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Padding(
-                              padding:
-                                  EdgeInsetsDirectional.fromSTEB(20, 0, 0, 0),
+                              padding: const EdgeInsetsDirectional.fromSTEB(
+                                  20, 0, 0, 0),
                               child: Text(
-                                'Already have an account?',
+                                '已有账号?',
                                 style: FlutterFlowTheme.of(context).bodyMedium,
                               ),
                             ),
@@ -348,25 +366,26 @@ class _SignUpViewState extends State<SignUpView> {
                                   ),
                                 );
                               },
-                              text: 'Login',
+                              text: '去登录',
                               options: FFButtonOptions(
-                                width: 90,
+                                width: 148,
                                 height: 30,
-                                padding:
-                                    EdgeInsetsDirectional.fromSTEB(0, 0, 0, 0),
+                                padding: const EdgeInsetsDirectional.fromSTEB(
+                                    0, 0, 0, 0),
                                 iconPadding:
-                                    EdgeInsetsDirectional.fromSTEB(0, 0, 0, 0),
-                                color: Color(0x00FFFFFF),
+                                    const EdgeInsetsDirectional.fromSTEB(
+                                        0, 0, 0, 0),
+                                color: const Color(0x00FFFFFF),
                                 textStyle: FlutterFlowTheme.of(context)
                                     .titleSmall
                                     .override(
                                       fontFamily: 'Lexend Deca',
-                                      color: Color(0xFF39D2C0),
+                                      color: const Color(0xFF39D2C0),
                                       fontSize: 14,
                                       fontWeight: FontWeight.bold,
                                     ),
                                 elevation: 0,
-                                borderSide: BorderSide(
+                                borderSide: const BorderSide(
                                   color: Colors.transparent,
                                   width: 1,
                                 ),

@@ -1,5 +1,19 @@
 import 'package:flutter/widgets.dart';
 
+class LatLng {
+  const LatLng(this.latitude, this.longitude);
+
+  LatLng.fromMap(Map<dynamic, dynamic> map)
+      : latitude = map['latitude'] as double?,
+        longitude = map['longitude'] as double?;
+
+  final double? latitude;
+  final double? longitude;
+
+  Map<String, double?> toMap() =>
+      {'latitude': latitude, 'longitude': longitude};
+}
+
 class LocationModel extends ChangeNotifier {
   LocationModel({
     this.description,
@@ -10,6 +24,7 @@ class LocationModel extends ChangeNotifier {
     this.cityCode,
     this.country,
     this.district,
+    this.latLng,
     this.latitude,
     this.longitude,
     this.formattedAddress,
@@ -28,6 +43,7 @@ class LocationModel extends ChangeNotifier {
   void fromMap(Map<String, dynamic> map) {
     description = map['description'] as String?;
     code = map['code'] as int?;
+    latLng = LatLng.fromMap(map['latLng']);
     latitude = map['latLng']['latitude'] as double?;
     longitude = map['latLng']['longitude'] as double?;
     timestamp = map['timestamp'] as double?;
@@ -47,6 +63,7 @@ class LocationModel extends ChangeNotifier {
     province = map['province'] as String?;
     street = map['street'] as String?;
     locationType = map['locationType'] as int?;
+    notifyListeners();
   }
 
   late String? formattedAddress;
@@ -69,6 +86,9 @@ class LocationModel extends ChangeNotifier {
   late double? accuracy;
   late String? provider;
 
+  // 默认定位北京
+  late LatLng? latLng = const LatLng(39.909187, 116.397451);
+
   late int? code;
 
   ///  描述
@@ -77,8 +97,6 @@ class LocationModel extends ChangeNotifier {
   late int? locationType;
 
   Map<String, dynamic> toMap() => {}..addAll({
-      'description': description,
-      'code': code,
       'adCode': adCode,
       'latitude': latitude,
       'longitude': longitude,

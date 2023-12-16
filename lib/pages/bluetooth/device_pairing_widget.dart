@@ -1,13 +1,17 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:da_yan_app/models/location_model.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:provider/provider.dart';
 
-import './bluetooth_model.dart';
-export './bluetooth_model.dart';
+import 'bluetooth_model.dart';
+export 'bluetooth_model.dart';
+import 'device_name_picker.dart';
+
+import '../../http/api.dart';
 
 class DevicePairing extends StatefulWidget {
   const DevicePairing({super.key});
@@ -20,6 +24,7 @@ class _DevicePairingState extends State<DevicePairing> {
   BluetoothAdapterState _adapterState = BluetoothAdapterState.unknown;
   late StreamSubscription<BluetoothAdapterState> _adapterStateStateSubscription;
 
+  late BluetoothDevice _firstDevice;
   List<ScanResult> _scanResults = [];
   late StreamSubscription<List<ScanResult>> _scanResultsSubscription;
   bool isPairing = false;
@@ -48,18 +53,19 @@ class _DevicePairingState extends State<DevicePairing> {
 
       // 监听搜索扫描结果
       _scanResultsSubscription = FlutterBluePlus.scanResults.listen((results) {
-        debugPrint('scanResults: $results');
+        List<ScanResult> filterResults = results
+            .where((ScanResult scanResult) =>
+                scanResult.rssi > -60 &&
+                !scanResult.device.isConnected &&
+                scanResult.device.platformName.isNotEmpty)
+            .toList();
+        if (filterResults.length > 0) {
+          FlutterBluePlus.stopScan();
+        }
+        debugPrint('_filterResults------------------: $filterResults');
+        if (filterResults.isEmpty) return;
         setState(() {
-          List<ScanResult> filterResults = results
-              .where((ScanResult scanResult) =>
-                  scanResult.rssi > -60 &&
-                  !scanResult.device.isConnected &&
-                  scanResult.device.platformName.isNotEmpty)
-              .toList();
-          if (filterResults.length > 0) {
-            FlutterBluePlus.stopScan();
-          }
-          debugPrint('------------------_filterResults: $filterResults');
+          _firstDevice = filterResults[0].device;
           _scanResults = filterResults;
         });
       }, onError: (e) {
@@ -106,6 +112,33 @@ class _DevicePairingState extends State<DevicePairing> {
     super.dispose();
   }
 
+  void handleOk(String name) async {
+    final locationModel = Provider.of<LocationModel>(context, listen: false);
+    final deviceModel =
+        Provider.of<BluetoothDeviceModel>(context, listen: false);
+    final createDevice = {
+      'deviceId': _firstDevice.remoteId.toString(),
+      'name': name,
+      'latitude': locationModel.latitude,
+      'longitude': locationModel.longitude,
+      'formattedAddress': locationModel.formattedAddress,
+      'address': {
+        ...locationModel.toMap(),
+      }
+    };
+    final result = await Api.connect(createDevice) as Map;
+    if (!result['success']) return;
+    // 新增设备触发更新
+    debugPrint('createDevice----------$createDevice');
+    final device = LocalBluetoothDevice(remoteId: _firstDevice.remoteId);
+    createDevice['localName'] = createDevice['name'];
+    device.formMap(createDevice);
+    deviceModel.add(device);
+    // 隐藏弹窗
+    Navigator.pop(context);
+    debugPrint('connect--------result----------');
+  }
+
   @override
   Widget build(BuildContext context) {
     late Widget renderWidget = buildStartPair(context);
@@ -114,11 +147,12 @@ class _DevicePairingState extends State<DevicePairing> {
       renderWidget = buildPairing(context);
     }
     if (isPairing && _scanResults.isNotEmpty) {
-      renderWidget = const DevicePaired();
+      renderWidget = DeviceNamePicker(onOk: handleOk);
     }
     return renderWidget;
   }
 
+// 准备
   Widget buildStartPair(BuildContext context) {
     return Container(
       width: double.infinity,
@@ -178,6 +212,7 @@ class _DevicePairingState extends State<DevicePairing> {
     );
   }
 
+  // 搜索中
   Widget buildPairing(BuildContext context) {
     return Container(
       width: double.infinity,
@@ -189,7 +224,7 @@ class _DevicePairingState extends State<DevicePairing> {
           const Padding(
             padding: EdgeInsets.only(top: 8),
             child: Text(
-              '正在搜搜Tag...',
+              '正在搜索Tag...',
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 28,
@@ -204,117 +239,6 @@ class _DevicePairingState extends State<DevicePairing> {
               'assets/device_finding.gif',
               width: 230,
               height: 230,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class DevicePaired extends StatefulWidget {
-  const DevicePaired({super.key});
-
-  @override
-  State<DevicePaired> createState() => _DevicePairedState();
-}
-
-class _DevicePairedState extends State<DevicePaired> {
-  final double _kItemExtent = 32.0;
-  final List<String> _deviceNames = <String>[
-    '背包',
-    '钥匙',
-    '钱包',
-    '伞',
-    '自行车',
-    '自定义命名',
-  ];
-  int _selectedIndex = 2;
-  final _nameController = TextEditingController();
-
-  @override
-  void initState() {
-    super.initState();
-    _nameController.text = _deviceNames[_selectedIndex];
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    debugPrint('_nameController: ${_nameController.text}');
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(20),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          const Padding(
-            padding: EdgeInsets.only(top: 8, bottom: 18),
-            child: Text(
-              '设置名称',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-          SizedBox(
-            height: 200,
-            child: CupertinoPicker(
-              magnification: 1.22,
-              squeeze: 1.2,
-              useMagnifier: true,
-              itemExtent: _kItemExtent,
-              // This sets the initial item.
-              scrollController: FixedExtentScrollController(
-                initialItem: _selectedIndex,
-              ),
-              // This is called when selected item is changed.
-              onSelectedItemChanged: (int selectedItem) {
-                setState(() {
-                  _selectedIndex = selectedItem;
-                  _nameController.text = _deviceNames[selectedItem];
-                });
-              },
-              children: List<Widget>.generate(_deviceNames.length, (int index) {
-                return Center(child: Text(_deviceNames[index]));
-              }),
-            ),
-          ),
-          if (_selectedIndex == 5)
-            SizedBox(
-              width: 300,
-              height: 48,
-              child: TextField(
-                controller: _nameController,
-              ),
-            ),
-          if (_selectedIndex != 5)
-            const SizedBox(
-              height: 48,
-            ),
-          const Padding(padding: EdgeInsets.only(top: 10)),
-          SizedBox(
-            width: 300,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  child: const Text('取消'),
-                ),
-                TextButton(
-                  onPressed: () {
-                    final model = Provider.of<BluetoothDeviceModel>(context,
-                        listen: false);
-                    model.changeName(_nameController.text);
-                  },
-                  child: const Text('确定'),
-                ),
-              ],
             ),
           ),
         ],

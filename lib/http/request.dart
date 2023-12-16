@@ -1,13 +1,14 @@
 import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import '../utils/local_storage.dart';
 
 class Request {
   // 配置 Dio 实例
   static final BaseOptions _options = BaseOptions(
-    baseUrl: 'http://localhost:3000',
-    connectTimeout: const Duration(seconds: 5),
-    receiveTimeout: const Duration(seconds: 3),
+    baseUrl: 'http://192.168.2.101:3000',
+    connectTimeout: const Duration(minutes: 1),
+    receiveTimeout: const Duration(minutes: 1),
   );
 
   // 创建 Dio 实例
@@ -25,6 +26,8 @@ class Request {
       });
     }
     try {
+      final authorization = LocalStorage().get('accessToken');
+      _dio.options.headers['authorization'] = authorization;
       Response response = await _dio.request(path,
           data: data, options: Options(method: method));
       debugPrint('Response: ${response.statusCode}');
@@ -32,13 +35,13 @@ class Request {
         try {
           if (response.data['code'] != 200) {
             debugPrint('服务器错误，状态码为：${response.data['code']}');
-            return Future.error(response.data['msg']);
+            return Future.error(response.data['message']);
           }
           debugPrint('响应的数据为：${response.data}');
           if (response.data is Map) {
-            return response.data['data'];
+            return response.data;
           } else {
-            return json.decode(response.data['data'].toString());
+            return json.decode(response.data.toString());
           }
         } catch (e) {
           debugPrint('解析响应数据异常：$e');
@@ -54,7 +57,8 @@ class Request {
         _handleHttpError(e.response?.statusCode as int);
         return Future.error('HTTP错误');
       }
-      debugPrint('请求异常：${_dioError(e)}');
+      debugPrint('Error--------------------${e.toString()}');
+      debugPrint('Dio请求异常：${_dioError(e)}');
       return Future.error(_dioError(e));
     } catch (e) {
       debugPrint('未知异常：$e');

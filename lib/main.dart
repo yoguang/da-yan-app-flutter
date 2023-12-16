@@ -11,6 +11,7 @@ import 'pages/personal/personal_view.dart';
 import 'pages/bluetooth/bluetooth_view.dart';
 import 'pages/bluetooth/bluetooth_model.dart';
 import 'models/location_model.dart';
+import 'pages/bluetooth/crowd_net.dart';
 
 void main() async {
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
@@ -94,6 +95,7 @@ class _MainPageState extends State<MainPage> {
         PageController(initialPage: _currentPageIndex, keepPage: true);
     FlutterNativeSplash.remove();
     initLocation();
+    // CrowdNet.startCrowNetwork();
   }
 
   @override
@@ -113,17 +115,17 @@ class _MainPageState extends State<MainPage> {
           children: tabPages,
         ),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-        showUnselectedLabels: true,
-        unselectedItemColor: Theme.of(context).unselectedWidgetColor,
-        selectedItemColor: Theme.of(context).primaryColor,
-        unselectedLabelStyle:
-            TextStyle(color: Theme.of(context).unselectedWidgetColor),
-        items: bottomNavBarItems,
-        currentIndex: _currentPageIndex,
-        onTap: _bottomNavBarOnTap,
-      ),
+      // bottomNavigationBar: BottomNavigationBar(
+      //   type: BottomNavigationBarType.fixed,
+      //   showUnselectedLabels: true,
+      //   unselectedItemColor: Theme.of(context).unselectedWidgetColor,
+      //   selectedItemColor: Theme.of(context).primaryColor,
+      //   unselectedLabelStyle:
+      //       TextStyle(color: Theme.of(context).unselectedWidgetColor),
+      //   items: bottomNavBarItems,
+      //   currentIndex: _currentPageIndex,
+      //   onTap: _bottomNavBarOnTap,
+      // ),
     );
   }
 
@@ -156,16 +158,20 @@ class _MainPageState extends State<MainPage> {
   /// 初始化定位
   Future<void> initLocation() async {
     if (!await getPermissions) return;
-    await FlAMapLocation().initialize(AMapLocationOption());
+    await FlAMapLocation().initialize(AMapLocationOption(
+        // interval: 10000, // 设置定位间隔(ms)。默认为2秒
+        ));
     getLocation();
+    // startLocationState();
   }
 
   // 连续定位
   Future<void> startLocationState() async {
     if (!await getPermissions) return;
-    final bool data = await FlAMapLocation().startLocationChanged(
+    await FlAMapLocation().startLocationChanged(
         onLocationChanged: (AMapLocation location) {
-      debugPrint('startLocationState================>: $location');
+      // debugPrint('连续定位----------------------${location.toMap()}');
+      _locationModel.fromMap(location.toMap());
     });
   }
 

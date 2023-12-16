@@ -6,7 +6,6 @@ import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 
 import '../../widgets/bluetooth_device_tile.dart';
 import 'device_finder_view.dart';
-import '../../http/api.dart';
 
 class BluetoothView extends StatefulWidget {
   const BluetoothView({super.key});
@@ -25,15 +24,9 @@ class _BluetoothViewState extends State<BluetoothView> {
   late StreamSubscription<List<ScanResult>> _scanResultsSubscription;
   late StreamSubscription<bool> _isScanningSubscription;
 
-  dioRequest() async {
-    final resp = await Api.login({});
-    debugPrint('resp: $resp');
-  }
-
   @override
   void initState() {
     super.initState();
-    dioRequest();
     FlutterBluePlus.setLogLevel(LogLevel.none);
     // 判断蓝牙适配器状态
     _adapterStateStateSubscription =

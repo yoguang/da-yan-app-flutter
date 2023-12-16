@@ -5,7 +5,8 @@ import 'package:provider/provider.dart';
 
 import 'device_info.dart';
 import 'bluetooth_model.dart';
-import '../../models/location_model.dart';
+import 'device_list_title.dart';
+import '../../http/api.dart';
 
 class Device {
   late String deviceId;
@@ -54,11 +55,8 @@ class DeviceListWidget extends StatefulWidget {
 }
 
 class _DeviceListWidgetState extends State<DeviceListWidget> {
-  late LocationModel _locationModel;
-  final List<BluetoothDevice> _devices = [
-    BluetoothDevice(remoteId: const DeviceIdentifier('5B:0D:EF:F2:2D:84')),
-    // BluetoothDevice(remoteId: const DeviceIdentifier('5B:0B:24:EE:B4:3E')),
-  ];
+  late final BluetoothDeviceModel _bluetoothDeviceModel =
+      Provider.of(context, listen: false);
 
   bool _showInfo = false;
   late Widget _DeviceInfoWidget = const SizedBox();
@@ -66,24 +64,28 @@ class _DeviceListWidgetState extends State<DeviceListWidget> {
   @override
   void initState() {
     super.initState();
-    connectDevices();
+    getDevice();
   }
 
-  Future connectDevices() async {
-    _devices.forEach((d) async {
-      await d.connect();
-      debugPrint('connect result: ${d.isConnected}');
-    });
+  Future getDevice() async {
+    final result = await Api.getBoundDevice() as Map;
+    if (result['success']) {
+      final devices = (result['data'] as List).map((item) {
+        final device =
+            LocalBluetoothDevice(remoteId: DeviceIdentifier(item['deviceId']));
+        device.formMap(item);
+        return device;
+      }).toList();
+      _bluetoothDeviceModel.addAll(devices);
+    }
   }
 
   void handleOnTap(BluetoothDevice device) {
-    _locationModel = Provider.of<LocationModel>(context, listen: false);
-    debugPrint('___locationModel--------------: ${_locationModel.latitude}');
     setState(() {
       _showInfo = true;
       _DeviceInfoWidget = DeviceInfoView(
         device: device,
-        onDiscover: () {
+        onClose: () {
           setState(() {
             _showInfo = false;
           });
@@ -94,25 +96,17 @@ class _DeviceListWidgetState extends State<DeviceListWidget> {
 
   @override
   Widget build(BuildContext context) {
-    final _name = Provider.of<BluetoothDeviceModel>(context, listen: true).name;
+    final bleModel = Provider.of<BluetoothDeviceModel>(context, listen: true);
     if (_showInfo) {
       return _DeviceInfoWidget;
     }
 
     return Column(
       children: [
-        Consumer<BluetoothDeviceModel>(
-            builder: (_, model, __) => Text(model.name)),
-        ..._devices.map(
-          (BluetoothDevice device) => ListTile(
-            leading: const CircleAvatar(
-              child: Icon(Icons.bluetooth),
-            ),
-            title: Text(device.platformName),
-            subtitle: Text(device.remoteId.toString()),
-            trailing: Text(device.isConnected.toString()),
-            onTap: () => {handleOnTap(device)},
-          ),
+        ...bleModel.list.map(
+          (LocalBluetoothDevice device) {
+            return DeviceListTitle(device: device);
+          },
         ),
       ],
     );

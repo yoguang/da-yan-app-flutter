@@ -1,36 +1,63 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
+import 'package:flutterflow_ui/flutterflow_ui.dart';
+
+import '../../models/location_model.dart' show LatLng;
 
 class LocalBluetoothDevice extends BluetoothDevice {
-  late String? address;
-  late String? distance;
+  late Map? address;
   late double? latitude;
   late double? longitude;
   LocalBluetoothDevice({required super.remoteId});
 
   @override
-  get localName {
-    return super.platformName;
+  late String localName = '';
+
+  // 格式化地址
+  String get formattedAddress {
+    debugPrint('address------------$address');
+    return address?['formattedAddress'] ??
+        address?['country'] +
+            address?['province'] +
+            address?['city'] +
+            address?['district'] +
+            address?['street'] +
+            address?['poiName'];
   }
 
-  set localName(String name) {
-    localName = name;
+  formMap(Map map) {
+    debugPrint('map000000000000000$map');
+    localName = map['name'];
+    address = map['address'];
+    latitude = map['latitude'] is double
+        ? map['latitude']
+        : double.parse(map['latitude']);
+    longitude = map['longitude'] is double
+        ? map['longitude']
+        : double.parse(map['longitude']);
   }
 
-  formJson(Map json) {
-    address = json['address'];
-    distance = json['distance'];
-    latitude = json['latitude'];
-    longitude = json['longitude'];
-  }
-
-  Map<String, dynamic> toJson() {
+  Map<String, dynamic> toMap() {
     final Map<String, dynamic> data = <String, dynamic>{};
+    data['localName'] = localName;
     data['address'] = address;
-    data['distance'] = distance;
     data['latitude'] = latitude;
     data['longitude'] = longitude;
     return data;
+  }
+
+  @override
+  @override
+  String toString() {
+    return 'LocalBluetoothDevice{'
+        'remoteId: $id, '
+        'localName: $localName, '
+        'address: $address, '
+        'latitude: $latitude, '
+        'longitude: $longitude, '
+        '}';
   }
 }
 
@@ -44,11 +71,17 @@ class BluetoothDeviceModel extends ChangeNotifier {
   }
 
   // 蓝牙设备列表
-  final List<LocalBluetoothDevice> _list = [];
+  List<LocalBluetoothDevice> _list = [];
 
   // 新增设备
   void add(LocalBluetoothDevice device) {
     _list.add(device);
+    notifyListeners();
+  }
+
+  // 批量新增设备
+  void addAll(List<LocalBluetoothDevice> devices) {
+    _list.addAll(devices);
     notifyListeners();
   }
 
@@ -62,8 +95,7 @@ class BluetoothDeviceModel extends ChangeNotifier {
 
   // 更新设备信息
   void update(LocalBluetoothDevice device) {
-    final _device = _list.firstWhere((e) => e.remoteId == device.remoteId);
-    _device.localName = device.localName ?? device.platformName;
+    _list.addOrUpdate(device);
     notifyListeners();
   }
 }

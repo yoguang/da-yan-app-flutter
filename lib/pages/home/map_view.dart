@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:fl_amap_map/fl_amap_map.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:provider/provider.dart';
+
+import '../../models/location_model.dart' show LocationModel;
 
 class MapView extends StatefulWidget {
   const MapView({super.key});
@@ -20,20 +23,29 @@ class _MapViewState extends State<MapView> {
 
   @override
   Widget build(BuildContext context) {
+    LocationModel location = Provider.of<LocationModel>(context, listen: true);
+    LatLng latLng = const LatLng(39.909187, 116.397451);
+    if (location.latitude != null) {
+      latLng = LatLng(location.latitude, location.longitude);
+    }
+
     return Center(
       child: AMapView(
-        options: const AMapOptions(
+        options: AMapOptions(
           mapType: MapType.standard,
           showCompass: false,
           showTraffic: false,
           showScale: false,
           showIndoorMap: false,
           showUserLocation: true,
-          latLng: LatLng(30.271689, 120.106997),
+          latLng: latLng,
         ),
         onCreateController: (AMapController controller) {
           this.controller = controller;
-          controller.setTrackingMode(TrackingMode.locate);
+          controller.setTrackingMode(TrackingMode.locate).then((_) {
+            controller
+                .setTrackingMode(TrackingMode.followLocationRotateNoCenter);
+          });
           // controller.addListener();
         },
       ),

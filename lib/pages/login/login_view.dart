@@ -2,8 +2,10 @@ import 'package:flutterflow_ui/flutterflow_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import '/pages/home/home_view.dart' show HomeView;
+import '/main.dart' show MainPage;
 import '/pages/signup/signup_view.dart' show SignUpView;
+import '/http/api.dart';
+import '/utils/local_storage.dart';
 
 import 'login_model.dart';
 export 'login_model.dart';
@@ -127,7 +129,7 @@ class _LoginViewState extends State<LoginView> {
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
                             Text(
-                              'Welcome Back,',
+                              '欢迎回来,',
                               style: FlutterFlowTheme.of(context).displaySmall,
                             ),
                           ],
@@ -146,10 +148,10 @@ class _LoginViewState extends State<LoginView> {
                                 focusNode: _model.emailAddressFocusNode,
                                 obscureText: false,
                                 decoration: InputDecoration(
-                                  labelText: 'Email Address',
+                                  labelText: '账号',
                                   labelStyle:
                                       FlutterFlowTheme.of(context).bodyMedium,
-                                  hintText: 'Enter your email here...',
+                                  hintText: '在此输入您的账号...',
                                   hintStyle:
                                       FlutterFlowTheme.of(context).bodyMedium,
                                   enabledBorder: OutlineInputBorder(
@@ -161,8 +163,9 @@ class _LoginViewState extends State<LoginView> {
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                   focusedBorder: OutlineInputBorder(
-                                    borderSide: const BorderSide(
-                                      color: Color(0x00000000),
+                                    borderSide: BorderSide(
+                                      color: FlutterFlowTheme.of(context)
+                                          .lineColor,
                                       width: 2,
                                     ),
                                     borderRadius: BorderRadius.circular(8),
@@ -188,7 +191,7 @@ class _LoginViewState extends State<LoginView> {
                                       const EdgeInsetsDirectional.fromSTEB(
                                           16, 24, 0, 24),
                                 ),
-                                style: FlutterFlowTheme.of(context).titleSmall,
+                                // style: FlutterFlowTheme.of(context).titleSmall,
                                 validator: _model
                                     .emailAddressControllerValidator
                                     .asValidator(context),
@@ -210,10 +213,10 @@ class _LoginViewState extends State<LoginView> {
                                 focusNode: _model.passwordFocusNode,
                                 obscureText: !_model.passwordVisibility,
                                 decoration: InputDecoration(
-                                  labelText: 'Password',
+                                  labelText: '密码',
                                   labelStyle:
                                       FlutterFlowTheme.of(context).bodyMedium,
-                                  hintText: 'Enter your email here...',
+                                  hintText: '在此输入您的密码...',
                                   hintStyle:
                                       FlutterFlowTheme.of(context).bodyMedium,
                                   enabledBorder: OutlineInputBorder(
@@ -225,8 +228,9 @@ class _LoginViewState extends State<LoginView> {
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                   focusedBorder: OutlineInputBorder(
-                                    borderSide: const BorderSide(
-                                      color: Color(0x00000000),
+                                    borderSide: BorderSide(
+                                      color: FlutterFlowTheme.of(context)
+                                          .lineColor,
                                       width: 2,
                                     ),
                                     borderRadius: BorderRadius.circular(8),
@@ -266,7 +270,7 @@ class _LoginViewState extends State<LoginView> {
                                     ),
                                   ),
                                 ),
-                                style: FlutterFlowTheme.of(context).titleSmall,
+                                // style: FlutterFlowTheme.of(context).titleSmall,
                                 validator: _model.passwordControllerValidator
                                     .asValidator(context),
                               ),
@@ -285,9 +289,9 @@ class _LoginViewState extends State<LoginView> {
                               onPressed: () {
                                 print('Button-ForgotPassword pressed ...');
                               },
-                              text: 'Forgot Password?',
+                              text: '忘记密码?',
                               options: FFButtonOptions(
-                                width: 170,
+                                width: 100,
                                 height: 30,
                                 padding: const EdgeInsetsDirectional.fromSTEB(
                                     0, 0, 0, 0),
@@ -308,24 +312,31 @@ class _LoginViewState extends State<LoginView> {
                                   0, 0, 4, 0),
                               child: FFButtonWidget(
                                 onPressed: () async {
-                                  // final user =
-                                  //     await authManager.signInWithEmail(
-                                  //   context,
-                                  //   _model.emailAddressController.text,
-                                  //   _model.passwordController.text,
-                                  // );
-                                  // if (user == null) {
-                                  //   return;
-                                  // }
+                                  final result = await Api.login({
+                                    'account':
+                                        _model.emailAddressController.text,
+                                    'password': _model.passwordController.text,
+                                  });
+                                  if (!result['success']) return;
 
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => const HomeView(),
-                                    ),
-                                  );
+                                  final user = result['data'];
+                                  final storage = LocalStorage();
+                                  storage.set(
+                                      'accessToken', user['accessToken']);
+                                  storage.set('user', user);
+                                  if (user == null) {
+                                    return;
+                                  }
+                                  if (context.mounted) {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => const MainPage(),
+                                      ),
+                                    );
+                                  }
                                 },
-                                text: 'Login',
+                                text: '登录',
                                 options: FFButtonOptions(
                                   width: 130,
                                   height: 50,
@@ -360,20 +371,19 @@ class _LoginViewState extends State<LoginView> {
                             const EdgeInsetsDirectional.fromSTEB(0, 12, 0, 24),
                         child: Row(
                           mainAxisSize: MainAxisSize.max,
-                          mainAxisAlignment: MainAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Padding(
                               padding: const EdgeInsetsDirectional.fromSTEB(
                                   20, 20, 20, 20),
                               child: Text(
-                                'Don\'t have an account?',
+                                '没有账号?',
                                 textAlign: TextAlign.start,
                                 style: FlutterFlowTheme.of(context)
                                     .bodyMedium
                                     .override(
                                       fontFamily: 'Lexend Deca',
-                                      color: FlutterFlowTheme.of(context)
-                                          .lineColor,
+                                      color: const Color(0xff666666),
                                       fontSize: 14,
                                       fontWeight: FontWeight.normal,
                                     ),
@@ -394,7 +404,7 @@ class _LoginViewState extends State<LoginView> {
                                   ),
                                 );
                               },
-                              text: 'Create Account',
+                              text: '注册',
                               options: FFButtonOptions(
                                 width: 148,
                                 height: 30,
@@ -409,7 +419,7 @@ class _LoginViewState extends State<LoginView> {
                                     .override(
                                       fontFamily: 'Lexend Deca',
                                       color: const Color(0xFF39D2C0),
-                                      fontSize: 14,
+                                      fontSize: 24,
                                       fontWeight: FontWeight.bold,
                                     ),
                                 elevation: 0,
