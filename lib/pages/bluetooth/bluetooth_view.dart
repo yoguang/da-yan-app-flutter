@@ -1,170 +1,177 @@
-import 'dart:async';
-import 'dart:io';
-import 'package:flutter/cupertino.dart';
+import 'dart:ui';
+
+import 'package:da_yan_app/pages/bluetooth/device_list.dart';
+import 'package:da_yan_app/pages/bluetooth/device_pairing_widget.dart';
+import 'package:da_yan_app/pages/home/amap_widget.dart';
+import 'package:da_yan_app/pages/login/login_view.dart';
+import 'package:da_yan_app/utils/local_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_blue_plus/flutter_blue_plus.dart';
+import 'package:provider/provider.dart';
+import 'package:snapping_bottom_sheet/snapping_bottom_sheet.dart';
 
-import '../../widgets/bluetooth_device_tile.dart';
-import 'device_finder_view.dart';
-
-class BluetoothView extends StatefulWidget {
-  const BluetoothView({super.key});
+class BluetoothDeviceView extends StatefulWidget {
+  const BluetoothDeviceView({super.key});
 
   @override
-  State<BluetoothView> createState() => _BluetoothViewState();
+  State<BluetoothDeviceView> createState() => _BluetoothDeviceViewState();
 }
 
-class _BluetoothViewState extends State<BluetoothView> {
-  BluetoothAdapterState _adapterState = BluetoothAdapterState.unknown;
-  late StreamSubscription<BluetoothAdapterState> _adapterStateStateSubscription;
-
-  List<BluetoothDevice> _connectedDevices = [];
-  List<ScanResult> _scanResults = [];
-  bool _isScanning = false;
-  late StreamSubscription<List<ScanResult>> _scanResultsSubscription;
-  late StreamSubscription<bool> _isScanningSubscription;
-
-  @override
-  void initState() {
-    super.initState();
-    FlutterBluePlus.setLogLevel(LogLevel.none);
-    // 判断蓝牙适配器状态
-    _adapterStateStateSubscription =
-        FlutterBluePlus.adapterState.listen((BluetoothAdapterState state) {
-      setState(() {
-        _adapterState = state;
-      });
-    });
-
-    //
-    FlutterBluePlus.systemDevices.then((devices) {
-      // debugPrint('systemDevices: $devices');
-      setState(() {
-        _connectedDevices = devices;
-      });
-    });
-
-    _scanResultsSubscription = FlutterBluePlus.scanResults.listen((results) {
-      debugPrint('scanResults: $results');
-      setState(() {
-        List<ScanResult> filterResults = results
-            .where((ScanResult scanResult) =>
-                scanResult.rssi > -60 &&
-                scanResult.device.platformName.isNotEmpty)
-            .toList();
-        debugPrint('_filterResults: $filterResults');
-        _scanResults = filterResults;
-      });
-    }, onError: (e) {
-      debugPrint(e.toString());
-    });
-
-    _isScanningSubscription = FlutterBluePlus.isScanning.listen((state) {
-      setState(() {
-        _isScanning = state;
-      });
-    });
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    _adapterStateStateSubscription.cancel();
-    _scanResultsSubscription.cancel();
-    _isScanningSubscription.cancel();
-  }
-
-  Future onScanPressed() async {
-    try {
-      // android is slow when asking for all advertisments,
-      // so instead we only ask for 1/8 of them
-      // android 在请求所有广告时速度很慢，
-      // 所以我们只要求其中的 1/8
-      int divisor = Platform.isAndroid ? 8 : 1;
-      await FlutterBluePlus.startScan(
-          timeout: const Duration(seconds: 15),
-          continuousUpdates: true,
-          continuousDivisor: divisor);
-    } catch (e) {
-      debugPrint('Start Scan Error: $e');
-    }
-    setState(() {});
-  }
-
-  Future onStopPressed() async {
-    try {
-      if (FlutterBluePlus.isScanningNow) {
-        FlutterBluePlus.stopScan();
-      }
-    } catch (e) {
-      debugPrint('Stop Scan Error: $e');
-    }
-  }
-
-  void onConnectPressed(BluetoothDevice device) {
-    print('device------------------');
-    print(device);
-    device.connect().catchError((e) {
-      debugPrint('device.connect Error: $e');
-    });
-  }
-
-  gotoDeviceFinderView() {
-    // 初始化蓝牙设备
-    BluetoothDevice device =
-        BluetoothDevice(remoteId: const DeviceIdentifier('5B:0D:EF:F2:2D:84'));
-
-    MaterialPageRoute route = MaterialPageRoute(
-      builder: (context) => DeviceFinderView(device: device),
-      settings: const RouteSettings(name: '/DeviceFiner'),
-    );
-    Navigator.of(context).push(route);
-  }
-
-  // 创建页面从底部进入路由
-  Route _createAnimationRoute(BluetoothDevice device) {
-    return PageRouteBuilder(
-      pageBuilder: (context, animation, secondaryAnimation) =>
-          DeviceFinderView(device: device),
-      transitionsBuilder: (context, animation, secondaryAnimation, child) {
-        const begin = Offset(0.0, 1.0);
-        const end = Offset.zero;
-        final tween = Tween(begin: begin, end: end);
-        final offsetAnimation = animation.drive(tween);
-        return SlideTransition(
-          position: offsetAnimation,
-          child: child,
-        );
-      },
-    );
-  }
+class _BluetoothDeviceViewState extends State<BluetoothDeviceView> {
+  late final LocalStorage localStorage = LocalStorage();
+  SheetController controller = SheetController();
 
   @override
   Widget build(BuildContext context) {
-    debugPrint(_adapterState.toString());
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+    final bleModel = Provider.of<BluetoothDeviceModel>(context);
+
+    return SnappingBottomSheet(
+      controller: controller,
+      color: Colors.white,
+      shadowColor: Colors.transparent,
+      elevation: 1,
+      cornerRadius: 16,
+      cornerRadiusOnFullscreen: 16,
+      snapSpec: SnapSpec(
+        initialSnap: bleModel.listScrollSnapped,
+        snap: true,
+        positioning: SnapPositioning.relativeToAvailableSpace,
+        snappings: const [
+          SnapSpec.headerFooterSnap,
+          0.43,
+          0.99,
+        ],
+        onSnap: (state, snap) {
+          bleModel.changeSnapped(snap!);
+          debugPrint('Snapped to $snap');
+        },
+      ),
+      liftOnScrollHeaderElevation: 12.0,
+      liftOnScrollFooterElevation: 12.0,
+      body: Stack(
         children: [
-          ElevatedButton(
-            onPressed: gotoDeviceFinderView,
-            child: Text('根据已知remoteId链接蓝牙'),
-          ),
-          TextButton(onPressed: onScanPressed, child: Text('扫描')),
-          TextButton(onPressed: onStopPressed, child: Text('停止扫描')),
-          ..._scanResults.map(
-            (e) => BluetoothDeviceTile(
-              device: e.device,
-              onOpen: () {
-                onConnectPressed(e.device);
-              },
-              onConnect: () {
-                onConnectPressed(e.device);
-              },
-            ),
-          )
+          AMapViewWidget(),
         ],
       ),
+      headerBuilder: buildHeader,
+      customBuilder: buildInfiniteChild,
+    );
+  }
+
+// BottomSheet 头部
+  Widget buildHeader(BuildContext context, SheetState state) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          const Padding(padding: EdgeInsets.only(top: 8)),
+          Align(
+            alignment: Alignment.topCenter,
+            child: Container(
+              width: 28,
+              height: 4,
+              color: Colors.grey[400],
+            ),
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              const Text(
+                '设备',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              IconButton(
+                onPressed: () async {
+                  final token = localStorage.get('accessToken');
+                  if (token == null) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const LoginView()),
+                    );
+                    return;
+                  }
+                  await showBottomSheetDialog(context);
+                },
+                icon: Icon(
+                  Icons.add,
+                  color: Theme.of(context).primaryColor,
+                ),
+                iconSize: 28,
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget buildInfiniteChild(
+    BuildContext context,
+    ScrollController controller,
+    SheetState state,
+  ) {
+    return BackdropFilter(
+      filter: ImageFilter.blur(sigmaX: 22, sigmaY: 22),
+      child: SingleChildScrollView(
+        controller: controller,
+        child: const DeviceListWidget(),
+      ),
+    );
+  }
+
+  Future<void> showBottomSheetDialog(BuildContext context) async {
+    await showSnappingBottomSheet(
+      context,
+      // parentBuilder: (context, sheet) {
+      //   return Theme(
+      //     data: ThemeData.dark(),
+      //     child: sheet,
+      //   );
+      // },
+      builder: (context) {
+        return SnappingBottomSheetDialog(
+          // 控制工作表状态的控制器。
+          controller: controller,
+          // 工作表的基本动画持续时间。滑动和甩动的持续时间可能不同。
+          duration: const Duration(milliseconds: 500),
+          // [SnapSpec] 定义工作表应如何对齐或是否应该对齐。
+          snapSpec: const SnapSpec(
+            snap: true,
+            initialSnap: 0.5,
+            snappings: [0.5],
+          ),
+          color: Colors.white,
+          maxWidth: double.infinity,
+          minHeight: MediaQuery.of(context).size.height / 2,
+          builder: (context, state) {
+            return Material(
+              child: Stack(
+                children: [
+                  Positioned(
+                    top: 20,
+                    right: 20,
+                    child: SizedBox(
+                      width: 32,
+                      height: 32,
+                      child: IconButton.filledTonal(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        icon: const Icon(
+                          Icons.close,
+                          size: 16,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const DevicePairing(),
+                ],
+              ),
+            );
+          },
+        );
+      },
     );
   }
 }

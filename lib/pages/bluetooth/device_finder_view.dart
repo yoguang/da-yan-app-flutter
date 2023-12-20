@@ -55,17 +55,6 @@ class _DeviceFinderViewState extends State<DeviceFinderView> {
         _device.connect().catchError((e) {
           debugPrint('device.connect Error: $e');
         });
-        return;
-        // 判断蓝牙授权情况
-        if (await Permission.bluetooth.isGranted) {
-          // 连接蓝牙设备
-          _device.connect().catchError((e) {
-            debugPrint('device.connect Error: $e');
-          });
-        } else {
-          final isGranted = await Permission.bluetooth.request().isGranted;
-          debugPrint('result===========> $isGranted');
-        }
       }
       setState(() {
         _adapterState = state;

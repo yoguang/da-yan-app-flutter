@@ -17,6 +17,9 @@ class LocalBluetoothDevice extends BluetoothDevice {
 
   // 格式化地址
   String get formattedAddress {
+    if (address?['formattedAddress'] == null && address?['country'] == null) {
+      return '';
+    }
     debugPrint('address------------$address');
     return address?['formattedAddress'] ??
         address?['country'] +
@@ -63,15 +66,25 @@ class LocalBluetoothDevice extends BluetoothDevice {
 
 class BluetoothDeviceModel extends ChangeNotifier {
   String name = '初始化';
+  // 选中的设备，查看详情
+  LocalBluetoothDevice? selectedDevice;
+  // 设备列表初始位置
+  double listScrollSnapped = 0.43;
 
-  void changeName(String val) {
-    debugPrint('BluetoothDeviceModel changeName: $val');
-    name = val;
+  // 改变列表视图位置
+  void changeSnapped(double snap) {
+    listScrollSnapped = snap;
     notifyListeners();
   }
 
   // 蓝牙设备列表
   List<LocalBluetoothDevice> _list = [];
+
+  // 列表选择设备
+  void select(LocalBluetoothDevice? device) {
+    selectedDevice = device;
+    notifyListeners();
+  }
 
   // 新增设备
   void add(LocalBluetoothDevice device) {

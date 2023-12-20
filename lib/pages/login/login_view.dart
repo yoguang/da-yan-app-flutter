@@ -2,7 +2,7 @@ import 'package:flutterflow_ui/flutterflow_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import '/main.dart' show MainPage;
+import '/pages/index.dart' show MainPage;
 import '/pages/signup/signup_view.dart' show SignUpView;
 import '/http/api.dart';
 import '/utils/local_storage.dart';

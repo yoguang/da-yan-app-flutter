@@ -1,10 +1,9 @@
 name: da_yan_app
 description: "大雁APP，基于Flutter实现的一款BLE低功耗蓝牙定位查找应用程序。"
-# The following line prevents the package from being accidentally published to
-# pub.dev using `flutter pub publish`. This is preferred for private packages.
-publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
-version: 1.0.0+1
+publish_to: 'none'
+
+version: 0.0.1
 
 environment:
   sdk: '>=3.2.0 <4.0.0'
@@ -15,10 +14,11 @@ dependencies:
 
   cupertino_icons: ^1.0.2
   flutterflow_ui: ^0.2.0+1
-  geolocator: ^10.1.0
-  # fl_amap: ^2.5.3
-  fl_amap_map:
-    path: /Users/wyg/Flutter/flutter_plugins/fl_amap/fl_amap_map
+  amap_flutter_map:
+    path: /Users/wyg/Flutter/flutter_plugins/amap_flutter_map
+  amap_flutter_base:
+    path: /Users/wyg/Flutter/flutter_plugins/amap_flutter_base
+  amap_flutter_location: ^3.0.0
   permission_handler: ^11.0.1
   flutter_blue_plus: ^1.30.3
   dio: ^5.4.0
@@ -39,6 +39,7 @@ flutter:
   
   assets:
     - assets/
+    - assets/markers/
 
 # 启动动画
 flutter_native_splash:

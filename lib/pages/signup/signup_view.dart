@@ -5,7 +5,7 @@ import 'package:flutter/services.dart';
 
 import '/pages/login/login_view.dart' show LoginView;
 import '/http/api.dart';
-import '/main.dart' show MainPage;
+import '/pages/index.dart' show MainPage;
 
 import 'signup_model.dart';
 export 'signup_view.dart';

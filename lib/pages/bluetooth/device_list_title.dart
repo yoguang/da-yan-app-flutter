@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:amap_flutter_base/amap_flutter_base.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
@@ -48,8 +49,9 @@ class Device {
 }
 
 class DeviceListTitle extends StatefulWidget {
-  const DeviceListTitle({super.key, required this.device});
+  const DeviceListTitle({super.key, required this.device, this.onTap});
   final LocalBluetoothDevice device;
+  final ArgumentCallback<LocalBluetoothDevice>? onTap;
 
   @override
   State<DeviceListTitle> createState() => _DeviceListTitleState();
@@ -85,6 +87,7 @@ class _DeviceListTitleState extends State<DeviceListTitle> {
     final locationModel = Provider.of<LocationModel>(context, listen: false);
     final bleModel = Provider.of<BluetoothDeviceModel>(context, listen: false);
     final device = widget.device;
+    if (locationModel.latitude == null) return;
     device.latitude = locationModel.latitude ?? device.latitude;
     device.longitude = locationModel.longitude ?? device.longitude;
     device.address = locationModel.toMap();
@@ -92,7 +95,9 @@ class _DeviceListTitleState extends State<DeviceListTitle> {
   }
 
   void handleOnTap() {
-    setState(() {});
+    if (widget.onTap != null) {
+      widget.onTap!(widget.device);
+    }
   }
 
   @override
@@ -103,13 +108,17 @@ class _DeviceListTitleState extends State<DeviceListTitle> {
 
   @override
   Widget build(BuildContext context) {
-    final latLng = Provider.of<LocationModel>(context).latLng;
+    final locationModel = Provider.of<LocationModel>(context);
+    final Map latLng1 = {
+      'latitude': locationModel.latitude,
+      'longitude': locationModel.longitude
+    };
     final Map latLng2 = {
       'latitude': widget.device.latitude,
       'longitude': widget.device.longitude
     };
     final distance = formattedDistance(
-      latLng?.toMap(),
+      latLng1,
       latLng2,
     );
 

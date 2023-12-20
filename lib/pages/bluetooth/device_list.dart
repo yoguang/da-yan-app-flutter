@@ -2,11 +2,13 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:provider/provider.dart';
+import 'package:snapping_bottom_sheet/snapping_bottom_sheet.dart';
 
-import 'device_info.dart';
+import 'device_info_view.dart';
 import 'bluetooth_model.dart';
 import 'device_list_title.dart';
 import '../../http/api.dart';
+import 'device_info_view.dart' show DeviceInfoView;
 
 class Device {
   late String deviceId;
@@ -47,8 +49,7 @@ class Device {
 }
 
 class DeviceListWidget extends StatefulWidget {
-  const DeviceListWidget({super.key, required this.devicesData});
-  final List<Device> devicesData;
+  const DeviceListWidget({super.key});
 
   @override
   State<DeviceListWidget> createState() => _DeviceListWidgetState();
@@ -80,7 +81,7 @@ class _DeviceListWidgetState extends State<DeviceListWidget> {
     }
   }
 
-  void handleOnTap(BluetoothDevice device) {
+  void handleOnTap(LocalBluetoothDevice device) {
     setState(() {
       _showInfo = true;
       _DeviceInfoWidget = DeviceInfoView(
@@ -100,12 +101,37 @@ class _DeviceListWidgetState extends State<DeviceListWidget> {
     if (_showInfo) {
       return _DeviceInfoWidget;
     }
+    if (bleModel.list.isEmpty) {
+      return Center(
+        child: Column(
+          children: [
+            const Padding(padding: EdgeInsets.only(top: 30)),
+            Image.asset(
+              'assets/device_not_found.png',
+              width: 458 / 2,
+              height: 280 / 2,
+            ),
+            CupertinoButton(
+              onPressed: () {},
+              child: const Text('去添加'),
+            )
+          ],
+        ),
+      );
+    }
 
     return Column(
       children: [
         ...bleModel.list.map(
           (LocalBluetoothDevice device) {
-            return DeviceListTitle(device: device);
+            return DeviceListTitle(
+              device: device,
+              onTap: (device) {
+                final model =
+                    Provider.of<BluetoothDeviceModel>(context, listen: false);
+                model.select(device);
+              },
+            );
           },
         ),
       ],
