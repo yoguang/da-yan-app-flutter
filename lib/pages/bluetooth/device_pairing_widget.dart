@@ -1,12 +1,11 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:da_yan_app/models/location_model.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:provider/provider.dart';
 
+import '/models/location_model.dart';
 import 'bluetooth_model.dart';
 export 'bluetooth_model.dart';
 import 'device_name_picker.dart';

@@ -1,19 +1,17 @@
 import 'dart:async';
 
-import 'package:da_yan_app/pages/bluetooth/bluetooth_model.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:provider/provider.dart';
 import 'package:snapping_bottom_sheet/snapping_bottom_sheet.dart';
 
+import '/pages/bluetooth/bluetooth_model.dart';
+
 import 'device_finder_view.dart';
 
 class DeviceInfoView extends StatefulWidget {
-  final LocalBluetoothDevice device;
-  final VoidCallback onClose;
-  const DeviceInfoView(
-      {super.key, required this.device, required this.onClose});
+  const DeviceInfoView({super.key});
 
   @override
   State<DeviceInfoView> createState() => _DeviceInfoViewState();
@@ -23,41 +21,14 @@ class _DeviceInfoViewState extends State<DeviceInfoView> {
   SheetController controller = SheetController();
   bool _isPlay = false;
 
-  // 播放声音
-  startPlay() async {
-    try {
-      setState(() {
-        _isPlay = true;
-      });
-      final device = widget.device;
-      debugPrint('startPlay device isConnected: ${device.isConnected}');
-      if (!device.isConnected) {
-        await device.connect().catchError((e) {
-          debugPrint(e.toString());
-        });
-        startPlay();
-        return;
-      }
-      BluetoothCharacteristic characteristic =
-          await _getDeviceWriteService(device);
-      _wireDeviceValue(characteristic, [0x01]);
-      // 3秒后停止播放
-      Timer(const Duration(seconds: 3), () {
-        _wireDeviceValue(characteristic, [0x00]);
-        setState(() {
-          _isPlay = false;
-        });
-      });
-    } catch (e) {
-      debugPrint('startPlay Error: $e');
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    final device = widget.device;
-    final bleModel = Provider.of<BluetoothDeviceModel>(context);
-
+    final deviceModel = Provider.of<BluetoothDeviceModel>(context);
+    final device = deviceModel.selectedDevice;
+    debugPrint('Sheet Info----------------------------');
+    if (device == null) {
+      return const SizedBox();
+    }
     return SnappingBottomSheet(
       controller: controller,
       color: Colors.white,
@@ -67,7 +38,7 @@ class _DeviceInfoViewState extends State<DeviceInfoView> {
       cornerRadiusOnFullscreen: 16,
       closeOnBackdropTap: true,
       snapSpec: SnapSpec(
-        initialSnap: bleModel.listScrollSnapped,
+        initialSnap: 0.43,
         snap: true,
         positioning: SnapPositioning.relativeToAvailableSpace,
         snappings: const [
@@ -75,7 +46,7 @@ class _DeviceInfoViewState extends State<DeviceInfoView> {
           0.99,
         ],
         onSnap: (state, snap) {
-          bleModel.changeSnapped(snap!);
+          deviceModel.changeSnapped(snap!);
           debugPrint('Snapped to $snap');
         },
       ),
@@ -111,7 +82,7 @@ class _DeviceInfoViewState extends State<DeviceInfoView> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Text(
-                      device.localName,
+                      device!.localName,
                       style: const TextStyle(
                           fontSize: 18, fontWeight: FontWeight.bold),
                     ),
@@ -215,7 +186,7 @@ class _DeviceInfoViewState extends State<DeviceInfoView> {
                           context,
                           MaterialPageRoute(
                             builder: (context) =>
-                                DeviceFinderView(device: widget.device),
+                                DeviceFinderView(device: device!),
                           ),
                         );
                       },
@@ -261,6 +232,37 @@ class _DeviceInfoViewState extends State<DeviceInfoView> {
         );
       },
     );
+  }
+
+  // 播放声音
+  startPlay() async {
+    try {
+      setState(() {
+        _isPlay = true;
+      });
+      final device = Provider.of<BluetoothDeviceModel>(context, listen: false)
+          .selectedDevice!;
+      debugPrint('startPlay device isConnected: ${device.isConnected}');
+      if (!device.isConnected) {
+        await device.connect().catchError((e) {
+          debugPrint(e.toString());
+        });
+        startPlay();
+        return;
+      }
+      BluetoothCharacteristic characteristic =
+          await _getDeviceWriteService(device);
+      _wireDeviceValue(characteristic, [0x01]);
+      // 3秒后停止播放
+      Timer(const Duration(seconds: 3), () {
+        _wireDeviceValue(characteristic, [0x00]);
+        setState(() {
+          _isPlay = false;
+        });
+      });
+    } catch (e) {
+      debugPrint('startPlay Error: $e');
+    }
   }
 }
 

@@ -1,14 +1,10 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:provider/provider.dart';
-import 'package:snapping_bottom_sheet/snapping_bottom_sheet.dart';
 
-import 'device_info_view.dart';
 import 'bluetooth_model.dart';
 import 'device_list_title.dart';
 import '../../http/api.dart';
-import 'device_info_view.dart' show DeviceInfoView;
 
 class Device {
   late String deviceId;
@@ -55,21 +51,27 @@ class DeviceListWidget extends StatefulWidget {
   State<DeviceListWidget> createState() => _DeviceListWidgetState();
 }
 
-class _DeviceListWidgetState extends State<DeviceListWidget> {
+class _DeviceListWidgetState extends State<DeviceListWidget>
+    with WidgetsBindingObserver {
   late final BluetoothDeviceModel _bluetoothDeviceModel =
       Provider.of(context, listen: false);
-
-  bool _showInfo = false;
-  late Widget _DeviceInfoWidget = const SizedBox();
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     getDevice();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    WidgetsBinding.instance.removeObserver(this);
   }
 
   Future getDevice() async {
     final result = await Api.getBoundDevice() as Map;
+    debugPrint('getDevice=================$result');
     if (result['success']) {
       final devices = (result['data'] as List).map((item) {
         final device =
@@ -81,26 +83,10 @@ class _DeviceListWidgetState extends State<DeviceListWidget> {
     }
   }
 
-  void handleOnTap(LocalBluetoothDevice device) {
-    setState(() {
-      _showInfo = true;
-      _DeviceInfoWidget = DeviceInfoView(
-        device: device,
-        onClose: () {
-          setState(() {
-            _showInfo = false;
-          });
-        },
-      );
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     final bleModel = Provider.of<BluetoothDeviceModel>(context, listen: true);
-    if (_showInfo) {
-      return _DeviceInfoWidget;
-    }
+
     if (bleModel.list.isEmpty) {
       return Center(
         child: Column(
@@ -136,5 +122,32 @@ class _DeviceListWidgetState extends State<DeviceListWidget> {
         ),
       ],
     );
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    switch (state) {
+      case AppLifecycleState.inactive:
+        //  应用程序处于闲置状态并且没有收到用户的输入事件。
+        //注意这个状态，在切换到后台时候会触发，所以流程应该是先冻结窗口，然后停止UI
+        print('LIST----->AppLifecycleState.inactive');
+        break;
+      case AppLifecycleState.paused:
+//      应用程序处于不可见状态
+        print('LIST----->AppLifecycleState.paused');
+        break;
+      case AppLifecycleState.resumed:
+        //    进入应用时候不会触发该状态
+        //  应用程序处于可见状态，并且可以响应用户的输入事件。它相当于 Android 中Activity的onResume。
+        print('LIST----->AppLifecycleState.resumed');
+        break;
+      case AppLifecycleState.detached:
+        //当前页面即将退出
+        print('LIST----->AppLifecycleState.detached');
+        break;
+      case AppLifecycleState.hidden:
+      // TODO: Handle this case.
+    }
   }
 }

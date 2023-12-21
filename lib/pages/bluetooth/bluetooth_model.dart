@@ -1,10 +1,7 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
-import 'package:flutterflow_ui/flutterflow_ui.dart';
-
-import '../../models/location_model.dart' show LatLng;
+import 'package:snapping_bottom_sheet/snapping_bottom_sheet.dart';
+import '../../http/api.dart';
 
 class LocalBluetoothDevice extends BluetoothDevice {
   late Map? address;
@@ -65,15 +62,15 @@ class LocalBluetoothDevice extends BluetoothDevice {
 }
 
 class BluetoothDeviceModel extends ChangeNotifier {
-  String name = '初始化';
   // 选中的设备，查看详情
   LocalBluetoothDevice? selectedDevice;
-  // 设备列表初始位置
-  double listScrollSnapped = 0.43;
+
+  // 设备 Sheet 窗体打开的高度
+  double sheetSnapped = 0.43;
 
   // 改变列表视图位置
   void changeSnapped(double snap) {
-    listScrollSnapped = snap;
+    sheetSnapped = snap;
     notifyListeners();
   }
 
@@ -110,5 +107,19 @@ class BluetoothDeviceModel extends ChangeNotifier {
   void update(LocalBluetoothDevice device) {
     _list.addOrUpdate(device);
     notifyListeners();
+  }
+
+  // 获取设备列表
+  Future getDevice() async {
+    final result = await Api.getBoundDevice() as Map;
+    if (result['success']) {
+      final devices = (result['data'] as List).map((item) {
+        final device =
+            LocalBluetoothDevice(remoteId: DeviceIdentifier(item['deviceId']));
+        device.formMap(item);
+        return device;
+      }).toList();
+      addAll(devices);
+    }
   }
 }

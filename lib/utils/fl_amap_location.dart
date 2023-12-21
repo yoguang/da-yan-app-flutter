@@ -14,6 +14,11 @@ class FlAMapLocation {
 
   FlAMapLocation._();
 
+  static AMapApiKey apiKey = const AMapApiKey(
+    iosKey: 'f10d6b1d907e53d9e7e5e0a14a99c224',
+    androidKey: '44617b96965472ca5b90e8a737e963f0',
+  );
+
   static FlAMapLocation? _singleton;
 
   bool _isInitialize = false;
@@ -73,8 +78,11 @@ class FlAMapLocation {
     _locationListener = _locationPlugin
         .onLocationChanged()
         .listen((Map<String, Object> result) {
-      print('------------------------------------------------------');
-      print(result);
+      debugPrint(
+          'FlAMapLocation↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓');
+      debugPrint(result.toString());
+      debugPrint(
+          'FlAMapLocation↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑');
       if (onLocationChanged != null) {
         onLocationChanged(result);
       }
@@ -168,13 +176,16 @@ class FlAMapLocation {
   }
 
   /// 动态申请定位权限
-  void requestPermission() async {
+  Future<bool> requestPermission() async {
     // 申请权限
     bool hasLocationPermission = await requestLocationPermission();
     if (hasLocationPermission) {
+      _locationPlugin.startLocation();
       debugPrint("hasLocationPermission=================>定位权限申请通过");
+      return true;
     } else {
       debugPrint("hasLocationPermission=================>定位权限申请不通过");
+      return false;
     }
   }
 

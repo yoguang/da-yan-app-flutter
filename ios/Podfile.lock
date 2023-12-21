@@ -1,16 +1,18 @@
 PODS:
-  - AMap3DMap (9.7.0):
-    - AMapFoundation (>= 1.8.0)
-  - AMapFoundation (1.8.2)
-  - AMapLocation (2.10.0):
-    - AMapFoundation (>= 1.8.0)
-  - fl_amap_map (0.0.1):
-    - AMap3DMap
-    - AMapLocation
-    - fl_channel
+  - AMap3DMap-NO-IDFA (9.7.0):
+    - AMapFoundation-NO-IDFA (>= 1.8.0)
+  - amap_flutter_location (0.0.1):
+    - AMapLocation-NO-IDFA
     - Flutter
-  - fl_channel (0.0.1):
+  - amap_flutter_map (0.0.1):
+    - AMap3DMap-NO-IDFA
+    - AMapSearch-NO-IDFA
     - Flutter
+  - AMapFoundation-NO-IDFA (1.8.2)
+  - AMapLocation-NO-IDFA (2.10.0):
+    - AMapFoundation-NO-IDFA (>= 1.8.0)
+  - AMapSearch-NO-IDFA (9.7.0):
+    - AMapFoundation-NO-IDFA (>= 1.8.0)
   - Flutter (1.0.0)
   - flutter_blue_plus (0.0.1):
     - Flutter
@@ -19,8 +21,6 @@ PODS:
   - FMDB (2.7.5):
     - FMDB/standard (= 2.7.5)
   - FMDB/standard (2.7.5)
-  - geolocator_apple (1.2.0):
-    - Flutter
   - path_provider_foundation (0.0.1):
     - Flutter
     - FlutterMacOS
@@ -36,12 +36,11 @@ PODS:
     - FMDB (>= 2.7.5)
 
 DEPENDENCIES:
-  - fl_amap_map (from `.symlinks/plugins/fl_amap_map/ios`)
-  - fl_channel (from `.symlinks/plugins/fl_channel/ios`)
+  - amap_flutter_location (from `.symlinks/plugins/amap_flutter_location/ios`)
+  - amap_flutter_map (from `.symlinks/plugins/amap_flutter_map/ios`)
   - Flutter (from `Flutter`)
   - flutter_blue_plus (from `.symlinks/plugins/flutter_blue_plus/ios`)
   - flutter_native_splash (from `.symlinks/plugins/flutter_native_splash/ios`)
-  - geolocator_apple (from `.symlinks/plugins/geolocator_apple/ios`)
   - path_provider_foundation (from `.symlinks/plugins/path_provider_foundation/darwin`)
   - permission_handler_apple (from `.symlinks/plugins/permission_handler_apple/ios`)
   - rive_common (from `.symlinks/plugins/rive_common/ios`)
@@ -50,24 +49,23 @@ DEPENDENCIES:
 
 SPEC REPOS:
   trunk:
-    - AMap3DMap
-    - AMapFoundation
-    - AMapLocation
+    - AMap3DMap-NO-IDFA
+    - AMapFoundation-NO-IDFA
+    - AMapLocation-NO-IDFA
+    - AMapSearch-NO-IDFA
     - FMDB
 
 EXTERNAL SOURCES:
-  fl_amap_map:
-    :path: ".symlinks/plugins/fl_amap_map/ios"
-  fl_channel:
-    :path: ".symlinks/plugins/fl_channel/ios"
+  amap_flutter_location:
+    :path: ".symlinks/plugins/amap_flutter_location/ios"
+  amap_flutter_map:
+    :path: ".symlinks/plugins/amap_flutter_map/ios"
   Flutter:
     :path: Flutter
   flutter_blue_plus:
     :path: ".symlinks/plugins/flutter_blue_plus/ios"
   flutter_native_splash:
     :path: ".symlinks/plugins/flutter_native_splash/ios"
-  geolocator_apple:
-    :path: ".symlinks/plugins/geolocator_apple/ios"
   path_provider_foundation:
     :path: ".symlinks/plugins/path_provider_foundation/darwin"
   permission_handler_apple:
@@ -80,16 +78,16 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/sqflite/ios"
 
 SPEC CHECKSUMS:
-  AMap3DMap: dce25dd3e51e6b92109caa7d0c97fc6055830fb3
-  AMapFoundation: 9885c48fc3a78fdfb84a0299a2293e56ea3c9fec
-  AMapLocation: 5248aec2455ebb5d104b367813c946430a2ee033
-  fl_amap_map: 8db33b344ab0a43f0c61d97996fae83c46c46255
-  fl_channel: d1b1ae03e0aa32702f1c137a2835761b32d35646
+  AMap3DMap-NO-IDFA: a3516859f2e82eda9fe9309c57d862f1543c2de4
+  amap_flutter_location: 98f5c746863de666e9e74720c871fe97360c25b0
+  amap_flutter_map: 6644e32a6d7c4c04d0213c707790386483f56ea0
+  AMapFoundation-NO-IDFA: 6ce0ef596d4eb8d934ff498e56747b6de1247b05
+  AMapLocation-NO-IDFA: 735791aeb1ba52dff666e4158b86caf4b68b5be7
+  AMapSearch-NO-IDFA: 749f73d5a773758f01a24eb8872f8798c8b47cb4
   Flutter: f04841e97a9d0b0a8025694d0796dd46242b2854
   flutter_blue_plus: 4837da7d00cf5d441fdd6635b3a57f936778ea96
   flutter_native_splash: 52501b97d1c0a5f898d687f1646226c1f93c56ef
   FMDB: 2ce00b547f966261cd18927a3ddb07cb6f3db82a
-  geolocator_apple: cc556e6844d508c95df1e87e3ea6fa4e58c50401
   path_provider_foundation: 29f094ae23ebbca9d3d0cec13889cd9060c0e943
   permission_handler_apple: e76247795d700c14ea09e3a2d8855d41ee80a2e6
   rive_common: 60ae7896ab40f9513974f36f015de33f70d2c5c5

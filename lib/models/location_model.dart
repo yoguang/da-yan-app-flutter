@@ -23,7 +23,6 @@ class LocationModel extends ChangeNotifier {
   });
 
   void fromMap(Map<String, dynamic> map) {
-    debugPrint('map=====================$map');
     latitude = map['latitude'] as double?;
     longitude = map['longitude'] as double?;
     locationTime = map['locationTime'] as String?;

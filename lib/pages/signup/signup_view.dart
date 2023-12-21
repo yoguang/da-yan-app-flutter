@@ -3,7 +3,6 @@ import 'package:flutterflow_ui/flutterflow_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import '/pages/login/login_view.dart' show LoginView;
 import '/http/api.dart';
 import '/pages/index.dart' show MainPage;
 
@@ -359,12 +358,8 @@ class _SignUpViewState extends State<SignUpView> {
                             ),
                             FFButtonWidget(
                               onPressed: () async {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => const LoginView(),
-                                  ),
-                                );
+                                // 返回登录
+                                Navigator.pop(context);
                               },
                               text: '去登录',
                               options: FFButtonOptions(

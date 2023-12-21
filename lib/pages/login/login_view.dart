@@ -328,12 +328,7 @@ class _LoginViewState extends State<LoginView> {
                                     return;
                                   }
                                   if (context.mounted) {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => const MainPage(),
-                                      ),
-                                    );
+                                    Navigator.pop(context, true);
                                   }
                                 },
                                 text: '登录',

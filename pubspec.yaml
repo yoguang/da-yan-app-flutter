@@ -18,7 +18,8 @@ dependencies:
     path: /Users/wyg/Flutter/flutter_plugins/amap_flutter_map
   amap_flutter_base:
     path: /Users/wyg/Flutter/flutter_plugins/amap_flutter_base
-  amap_flutter_location: ^3.0.0
+  amap_flutter_location:
+     path: /Users/wyg/Flutter/flutter_plugins/amap_flutter_location
   permission_handler: ^11.0.1
   flutter_blue_plus: ^1.30.3
   dio: ^5.4.0

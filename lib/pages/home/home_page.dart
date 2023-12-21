@@ -1,9 +1,8 @@
-import 'package:da_yan_app/pages/bluetooth/device_info_view.dart';
-import 'package:da_yan_app/pages/bluetooth/device_pairing_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:provider/provider.dart';
 
+import '/pages/bluetooth/device_info_view.dart';
+import '/pages/bluetooth/device_pairing_widget.dart';
 import '../../utils/local_storage.dart' show LocalStorage;
 import '../bluetooth/bluetooth_view.dart' show BluetoothDeviceView;
 
@@ -30,23 +29,17 @@ class _HomePageState extends State<HomePage>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    final selectedDevice =
-        Provider.of<BluetoothDeviceModel>(context).selectedDevice;
 
-    return Scaffold(
+    return const Scaffold(
       body: SafeArea(
         child: Stack(
           children: [
-            const Positioned(
+            Positioned(
               child: BluetoothDeviceView(),
             ),
-            if (selectedDevice != null)
-              Positioned(
-                child: DeviceInfoView(
-                  device: selectedDevice,
-                  onClose: () {},
-                ),
-              )
+            Positioned(
+              child: DeviceInfoView(),
+            )
           ],
         ),
       ),
