@@ -20,14 +20,34 @@ class DeviceInfoView extends StatefulWidget {
 class _DeviceInfoViewState extends State<DeviceInfoView> {
   SheetController controller = SheetController();
   bool _isPlay = false;
+  bool _isOpen = false;
+
+  @override
+  void initState() {
+    super.initState();
+    controller.hide();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final deviceModel =
+        Provider.of<BluetoothDeviceModel>(context, listen: false);
+    if (deviceModel.selectedDevice != null) {
+      _isOpen = true;
+      setState(() {});
+      controller.snapToExtent(0.43,
+          duration: const Duration(milliseconds: 500));
+    } else {
+      controller.snapToExtent(0.0, duration: const Duration(milliseconds: 300));
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final deviceModel = Provider.of<BluetoothDeviceModel>(context);
     final device = deviceModel.selectedDevice;
-    if (device == null) {
-      return const SizedBox();
-    }
+    debugPrint('Device Info build------------');
     return SnappingBottomSheet(
       controller: controller,
       color: Colors.white,
@@ -37,16 +57,21 @@ class _DeviceInfoViewState extends State<DeviceInfoView> {
       cornerRadiusOnFullscreen: 16,
       closeOnBackdropTap: true,
       snapSpec: SnapSpec(
-        initialSnap: 0.43,
+        initialSnap: 0.0,
         snap: true,
-        positioning: SnapPositioning.relativeToAvailableSpace,
         snappings: const [
+          0.0,
           0.43,
           0.99,
         ],
         onSnap: (state, snap) {
-          deviceModel.changeSnapped(snap!);
-          debugPrint('Snapped to $snap');
+          if (snap == 0.0 && _isOpen) {
+            _isOpen = false;
+            setState(() {});
+            deviceModel.select(null);
+            debugPrint('Snapped to: $_isOpen');
+          }
+          debugPrint('Snapped to: $snap');
         },
       ),
       liftOnScrollHeaderElevation: 12.0,
@@ -81,7 +106,7 @@ class _DeviceInfoViewState extends State<DeviceInfoView> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Text(
-                      device!.localName,
+                      device?.localName ?? '',
                       style: const TextStyle(
                           fontSize: 18, fontWeight: FontWeight.bold),
                     ),
@@ -103,7 +128,7 @@ class _DeviceInfoViewState extends State<DeviceInfoView> {
                 ),
               ),
               Text(
-                device.formattedAddress,
+                device?.formattedAddress ?? '',
                 style: const TextStyle(fontSize: 14),
               ),
               const Text(

@@ -36,7 +36,6 @@ class _BluetoothDeviceViewState extends State<BluetoothDeviceView> {
   @override
   Widget build(BuildContext context) {
     final bleModel = Provider.of<BluetoothDeviceModel>(context);
-    debugPrint('Sheet List----------------------------');
     return SnappingBottomSheet(
       controller: controller,
       color: Colors.white,
@@ -73,7 +72,6 @@ class _BluetoothDeviceViewState extends State<BluetoothDeviceView> {
         context,
         MaterialPageRoute(builder: (_) => const LoginView()),
       ).then((isLogin) async {
-        debugPrint('isLogin------------------$isLogin');
         if (isLogin == null) return;
         final bleModel =
             Provider.of<BluetoothDeviceModel>(context, listen: false);

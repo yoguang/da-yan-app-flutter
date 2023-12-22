@@ -75,7 +75,7 @@ class _AMapViewWidgetState extends State<AMapViewWidget>
     } else if (_showDeviceInfo) {
       updateCamera(_mapController!, _locationPosition);
     }
-    debugPrint('didChangeDependencies-----------------------$device');
+    debugPrint('AMap Widget didChangeDependencies-----------------------');
   }
 
   /// 更新全局定位
@@ -95,7 +95,9 @@ class _AMapViewWidgetState extends State<AMapViewWidget>
       longitude: longitude,
     );
     _locationPosition = target;
-    updateCamera(_mapController!, target);
+    if (_mapController != null) {
+      updateCamera(_mapController!, target);
+    }
     setState(() {});
   }
 

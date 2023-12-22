@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
-import 'package:snapping_bottom_sheet/snapping_bottom_sheet.dart';
 import '../../http/api.dart';
 
 class LocalBluetoothDevice extends BluetoothDevice {
@@ -17,7 +16,6 @@ class LocalBluetoothDevice extends BluetoothDevice {
     if (address?['formattedAddress'] == null && address?['country'] == null) {
       return '';
     }
-    debugPrint('address------------$address');
     return address?['formattedAddress'] ??
         address?['country'] +
             address?['province'] +
@@ -27,8 +25,10 @@ class LocalBluetoothDevice extends BluetoothDevice {
             address?['poiName'];
   }
 
+  // 地址简化
+  String get description => address?['description'];
+
   formMap(Map map) {
-    debugPrint('map000000000000000$map');
     localName = map['name'];
     address = map['address'];
     latitude = map['latitude'] is double

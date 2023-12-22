@@ -82,10 +82,7 @@ class _DeviceListTitleState extends State<DeviceListTitle> {
 
   Future connect() async {
     try {
-      await widget.device.connect(
-        timeout: const Duration(seconds: 10),
-        autoConnect: true,
-      );
+      await widget.device.connect();
     } finally {
       _connecting = false;
       setState(() {});
