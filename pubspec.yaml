@@ -33,6 +33,7 @@ dev_dependencies:
     sdk: flutter
 
   flutter_lints: ^2.0.0
+  flutter_launcher_icons: ^0.13.1
 
 flutter:
 # material3
@@ -41,6 +42,12 @@ flutter:
   assets:
     - assets/
     - assets/markers/
+
+# 启动图标
+flutter_icons:
+  image_path: "assets/launch/logo.png"
+  android: true
+  ios: true
 
 # 启动动画
 flutter_native_splash:
@@ -51,7 +58,7 @@ flutter_native_splash:
   # https://developer.android.com/guide/topics/ui/splash-screen
   # Following are Android 12 specific parameter.
   android_12:
-    image: assets/launch/android12splash.png
+    image: assets/launch/logo.png
 
     # Splash screen background color.
     # color: "#42a5f5"
