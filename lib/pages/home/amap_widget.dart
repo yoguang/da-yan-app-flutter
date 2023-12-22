@@ -56,7 +56,7 @@ class _AMapViewWidgetState extends State<AMapViewWidget>
     WidgetsBinding.instance.addObserver(this);
     _bluetoothDeviceModel =
         Provider.of<BluetoothDeviceModel>(context, listen: false);
-    // requestPermission();
+    requestPermission();
     initializeLocation();
   }
 
