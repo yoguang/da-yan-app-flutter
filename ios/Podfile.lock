@@ -2,7 +2,7 @@ PODS:
   - AMap3DMap-NO-IDFA (9.7.0):
     - AMapFoundation-NO-IDFA (>= 1.8.0)
   - amap_flutter_location (0.0.1):
-    - AMapLocation-NO-IDFA
+    - AMapLocation-NO-IDFA (= 2.10.0)
     - Flutter
   - amap_flutter_map (0.0.1):
     - AMap3DMap-NO-IDFA
@@ -79,7 +79,7 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   AMap3DMap-NO-IDFA: a3516859f2e82eda9fe9309c57d862f1543c2de4
-  amap_flutter_location: 98f5c746863de666e9e74720c871fe97360c25b0
+  amap_flutter_location: aec5656af9772d822efcc7a129c4e53301ce6770
   amap_flutter_map: 6644e32a6d7c4c04d0213c707790386483f56ea0
   AMapFoundation-NO-IDFA: 6ce0ef596d4eb8d934ff498e56747b6de1247b05
   AMapLocation-NO-IDFA: 735791aeb1ba52dff666e4158b86caf4b68b5be7

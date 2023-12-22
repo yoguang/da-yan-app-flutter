@@ -124,30 +124,30 @@ class _DeviceListWidgetState extends State<DeviceListWidget>
     );
   }
 
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    super.didChangeAppLifecycleState(state);
-    switch (state) {
-      case AppLifecycleState.inactive:
-        //  应用程序处于闲置状态并且没有收到用户的输入事件。
-        //注意这个状态，在切换到后台时候会触发，所以流程应该是先冻结窗口，然后停止UI
-        print('LIST----->AppLifecycleState.inactive');
-        break;
-      case AppLifecycleState.paused:
-//      应用程序处于不可见状态
-        print('LIST----->AppLifecycleState.paused');
-        break;
-      case AppLifecycleState.resumed:
-        //    进入应用时候不会触发该状态
-        //  应用程序处于可见状态，并且可以响应用户的输入事件。它相当于 Android 中Activity的onResume。
-        print('LIST----->AppLifecycleState.resumed');
-        break;
-      case AppLifecycleState.detached:
-        //当前页面即将退出
-        print('LIST----->AppLifecycleState.detached');
-        break;
-      case AppLifecycleState.hidden:
-      // TODO: Handle this case.
-    }
-  }
+  // @override
+  // void didChangeAppLifecycleState(AppLifecycleState state) {
+  //   super.didChangeAppLifecycleState(state);
+  //   switch (state) {
+  //     case AppLifecycleState.inactive:
+  //       //  应用程序处于闲置状态并且没有收到用户的输入事件。
+  //       //注意这个状态，在切换到后台时候会触发，所以流程应该是先冻结窗口，然后停止UI
+  //       print('LIST----->AppLifecycleState.inactive');
+  //       break;
+  //     case AppLifecycleState.paused:
+  //       // 应用程序处于不可见状态
+  //       print('LIST----->AppLifecycleState.paused');
+  //       break;
+  //     case AppLifecycleState.resumed:
+  //       //    进入应用时候不会触发该状态
+  //       //  应用程序处于可见状态，并且可以响应用户的输入事件。它相当于 Android 中Activity的onResume。
+  //       print('LIST----->AppLifecycleState.resumed');
+  //       break;
+  //     case AppLifecycleState.detached:
+  //       //当前页面即将退出
+  //       print('LIST----->AppLifecycleState.detached');
+  //       break;
+  //     case AppLifecycleState.hidden:
+  //     // TODO: Handle this case.
+  //   }
+  // }
 }

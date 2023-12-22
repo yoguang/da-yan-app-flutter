@@ -21,7 +21,9 @@ double calculateDistance(double lat1, double lon1, double lat2, double lon2) {
 
 // 格式化距离
 Map<String, dynamic> formattedDistance(latLng1, latLng2) {
-  if (latLng1 == null) return {'value': 0, 'text': ''};
+  if (latLng1 == null ||
+      latLng1['latitude'] == null ||
+      latLng1['longitude'] == null) return {'value': 0, 'text': ''};
   if (latLng2 == null) return {'value': 0, 'text': ''};
   final distanceNum = calculateDistance(latLng1['latitude'],
       latLng1['longitude'], latLng2['latitude'], latLng2['longitude']);

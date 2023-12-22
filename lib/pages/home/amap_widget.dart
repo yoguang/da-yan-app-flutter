@@ -5,7 +5,9 @@ import 'package:amap_flutter_location/amap_flutter_location.dart';
 import 'package:amap_flutter_location/amap_location_option.dart';
 import 'package:amap_flutter_map/amap_flutter_map.dart';
 import 'package:da_yan_app/utils/local_storage.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 
 import '/utils/fl_amap_location.dart';
@@ -21,6 +23,7 @@ class AMapViewWidget extends StatefulWidget {
 
 class _AMapViewWidgetState extends State<AMapViewWidget>
     with WidgetsBindingObserver {
+  AppLifecycleState _appLifecycleState = AppLifecycleState.resumed;
   AMapController? _mapController;
   final _locationPlugin = AMapFlutterLocation();
   late BluetoothDeviceModel? _bluetoothDeviceModel;
@@ -41,13 +44,19 @@ class _AMapViewWidgetState extends State<AMapViewWidget>
   /// 是否显示设备详情
   bool _showDeviceInfo = false;
 
+  /// 定位权限
+  bool _hasLocationPermission = true;
+
+  /// 定位初始化完成
+  bool _isLocationInitial = false;
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     _bluetoothDeviceModel =
         Provider.of<BluetoothDeviceModel>(context, listen: false);
-    requestPermission();
+    // requestPermission();
     initializeLocation();
   }
 
@@ -75,9 +84,10 @@ class _AMapViewWidgetState extends State<AMapViewWidget>
     model.fromMap(location);
   }
 
-  /// 初始化地图定位点
-  void initialPosition(Map location) {
-    debugPrint('location===========================$location');
+  /// 初始化我的位置以及地图中心
+  void initialCameraPosition(Map location) {
+    if (_isLocationInitial) return;
+    _isLocationInitial = true;
     final latitude = location['latitude'] as double;
     final longitude = location['longitude'] as double;
     final target = LatLng(
@@ -85,16 +95,16 @@ class _AMapViewWidgetState extends State<AMapViewWidget>
       longitude: longitude,
     );
     _locationPosition = target;
+    updateCamera(_mapController!, target);
     setState(() {});
   }
 
   /// 动态获取定位权限
-  void requestPermission() {
-    FlAMapLocation().requestPermission().then((bool granted) {
-      if (granted) {
-        _locationPlugin.startLocation();
-      } else {}
-    });
+  Future<bool> requestPermission() async {
+    bool has = await FlAMapLocation().requestPermission();
+    _hasLocationPermission = has;
+    setState(() {});
+    return has;
   }
 
   /// 初始化定位插件
@@ -108,13 +118,16 @@ class _AMapViewWidgetState extends State<AMapViewWidget>
 
     /// 监听定位变化
     _locationPlugin.onLocationChanged().listen((Map<String, Object> location) {
-      initialPosition(location);
+      if (location['errorCode'] != null) {
+        _locationPlugin.stopLocation();
+        return;
+      }
+      initialCameraPosition(location);
       updateLocationModel(location);
     });
 
     /// 设置10秒定位间隙
-    _locationPlugin
-        .setLocationOption(AMapLocationOption(locationInterval: 10 * 1000));
+    _locationPlugin.setLocationOption(AMapLocationOption());
 
     /// 开始定位
     _locationPlugin.startLocation();
@@ -156,9 +169,8 @@ class _AMapViewWidgetState extends State<AMapViewWidget>
                 longitude: device.longitude as double),
             onTap: (String id) {
               onMarkerTab(device);
-              debugPrint('device=================$device');
             });
-        _initMarkerMap[marker.id] = marker;
+        _initMarkerMap[device.remoteId.toString()] = marker;
       }
     }
     return Stack(
@@ -189,7 +201,14 @@ class _AMapViewWidgetState extends State<AMapViewWidget>
           right: 20,
           child: FloatingActionButton(
             backgroundColor: Colors.white,
-            onPressed: () {
+            onPressed: () async {
+              final hasGranted = await requestPermission();
+              if (!hasGranted) {
+                if (context.mounted) {
+                  _showAlertDialog(context);
+                }
+                return;
+              }
               _isMyPosition = true;
               _autoMoving = true;
               updateCamera(_mapController!, _locationPosition);
@@ -211,29 +230,70 @@ class _AMapViewWidgetState extends State<AMapViewWidget>
     );
   }
 
+  void _showAlertDialog(BuildContext context) {
+    showCupertinoModalPopup<void>(
+      context: context,
+      builder: (BuildContext context) => CupertinoAlertDialog(
+        title: const Text('定位权限'),
+        content: const Text(
+          '前往设置打开定位权限，已获取更好的体验。',
+          style: TextStyle(fontSize: 16),
+        ),
+        actions: <CupertinoDialogAction>[
+          CupertinoDialogAction(
+            isDefaultAction: true,
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            child: const Text('取消'),
+          ),
+          CupertinoDialogAction(
+            isDestructiveAction: true,
+            onPressed: () async {
+              /// 打开应用设置
+              openAppSettings();
+              Navigator.pop(context);
+            },
+            child: const Text('前往'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void restartLocation() async {
+    if (_hasLocationPermission) {
+      _locationPlugin.startLocation();
+    }
+  }
+
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
+    _appLifecycleState = state;
     switch (state) {
       case AppLifecycleState.inactive:
         //  应用程序处于闲置状态并且没有收到用户的输入事件。
         //注意这个状态，在切换到后台时候会触发，所以流程应该是先冻结窗口，然后停止UI
-        print('YM----->AppLifecycleState.inactive');
+        debugPrint('MapWidget----->AppLifecycleState.inactive');
         break;
       case AppLifecycleState.paused:
-//      应用程序处于不可见状态
-        print('YM----->AppLifecycleState.paused');
+        // 应用程序处于不可见状态
+        debugPrint('MapWidget----->AppLifecycleState.paused');
         break;
       case AppLifecycleState.resumed:
-        //    进入应用时候不会触发该状态
+        //  进入应用时候不会触发该状态
         //  应用程序处于可见状态，并且可以响应用户的输入事件。它相当于 Android 中Activity的onResume。
-        print('YM----->AppLifecycleState.resumed');
+        debugPrint('MapWidget----->AppLifecycleState.resumed');
+        restartLocation();
         break;
       case AppLifecycleState.detached:
         //当前页面即将退出
-        print('YM----->AppLifecycleState.detached');
+        debugPrint('MapWidget----->AppLifecycleState.detached');
         break;
       case AppLifecycleState.hidden:
+        debugPrint('MapWidget----->AppLifecycleState.hidden');
+        break;
       // TODO: Handle this case.
     }
   }

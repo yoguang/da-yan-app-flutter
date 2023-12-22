@@ -25,7 +25,6 @@ class _DeviceInfoViewState extends State<DeviceInfoView> {
   Widget build(BuildContext context) {
     final deviceModel = Provider.of<BluetoothDeviceModel>(context);
     final device = deviceModel.selectedDevice;
-    debugPrint('Sheet Info----------------------------');
     if (device == null) {
       return const SizedBox();
     }

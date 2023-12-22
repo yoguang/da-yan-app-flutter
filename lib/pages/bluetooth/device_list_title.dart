@@ -63,6 +63,7 @@ class _DeviceListTitleState extends State<DeviceListTitle> {
 
   late StreamSubscription<BluetoothConnectionState>
       _connectionStateSubscription;
+  late bool _connecting = true;
 
   @override
   void initState() {
@@ -80,7 +81,15 @@ class _DeviceListTitleState extends State<DeviceListTitle> {
   }
 
   Future connect() async {
-    await widget.device.connect();
+    try {
+      await widget.device.connect(
+        timeout: const Duration(seconds: 10),
+        autoConnect: true,
+      );
+    } finally {
+      _connecting = false;
+      setState(() {});
+    }
   }
 
   Future updateLocation() async {
@@ -111,8 +120,9 @@ class _DeviceListTitleState extends State<DeviceListTitle> {
     final locationModel = Provider.of<LocationModel>(context);
     final Map latLng1 = {
       'latitude': locationModel.latitude,
-      'longitude': locationModel.longitude
+      'longitude': locationModel.longitude,
     };
+
     final Map latLng2 = {
       'latitude': widget.device.latitude,
       'longitude': widget.device.longitude
@@ -128,7 +138,7 @@ class _DeviceListTitleState extends State<DeviceListTitle> {
       ),
       title: Text(widget.device.localName),
       subtitle: Text(widget.device.formattedAddress),
-      trailing: distance['text'] == ''
+      trailing: (distance['text'] == '' && _connecting)
           ? const CupertinoActivityIndicator()
           : Text(distance['text']),
       onTap: handleOnTap,
