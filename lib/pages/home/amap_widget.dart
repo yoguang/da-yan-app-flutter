@@ -124,12 +124,14 @@ class _AMapViewWidgetState extends State<AMapViewWidget>
         _locationPlugin.stopLocation();
         return;
       }
+      debugPrint('location-----------------------$location');
       initialCameraPosition(location);
       updateLocationModel(location);
     });
 
     /// 设置10秒定位间隙
-    _locationPlugin.setLocationOption(AMapLocationOption());
+    _locationPlugin
+        .setLocationOption(AMapLocationOption(locationInterval: 10 * 1000));
 
     /// 开始定位
     _locationPlugin.startLocation();
@@ -296,7 +298,6 @@ class _AMapViewWidgetState extends State<AMapViewWidget>
       case AppLifecycleState.hidden:
         debugPrint('MapWidget----->AppLifecycleState.hidden');
         break;
-      // TODO: Handle this case.
     }
   }
 }

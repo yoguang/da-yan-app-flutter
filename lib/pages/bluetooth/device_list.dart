@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 
 import 'bluetooth_model.dart';
 import 'device_list_title.dart';
+import 'device_add_button.dart';
 import '../../http/api.dart';
 
 class Device {
@@ -97,10 +98,7 @@ class _DeviceListWidgetState extends State<DeviceListWidget>
               width: 458 / 2,
               height: 280 / 2,
             ),
-            CupertinoButton(
-              onPressed: () {},
-              child: const Text('去添加'),
-            )
+            DeviceAddButton(text: const Text('去添加')),
           ],
         ),
       );

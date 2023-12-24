@@ -7,7 +7,6 @@ import 'package:provider/provider.dart';
 
 import '/models/location_model.dart';
 import 'bluetooth_model.dart';
-export 'bluetooth_model.dart';
 import 'device_name_picker.dart';
 
 import '../../http/api.dart';

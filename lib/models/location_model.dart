@@ -1,5 +1,7 @@
 import 'package:flutter/widgets.dart';
-import 'package:amap_flutter_base/amap_flutter_base.dart';
+import '../utils/local_storage.dart';
+
+final localStorage = LocalStorage();
 
 class LocationModel extends ChangeNotifier {
   LocationModel({
@@ -20,26 +22,32 @@ class LocationModel extends ChangeNotifier {
     this.speed,
     this.altitude,
     this.accuracy,
+    this.bearing,
   });
 
   void fromMap(Map<String, dynamic> map) {
-    latitude = map['latitude'] as double?;
-    longitude = map['longitude'] as double?;
-    locationTime = map['locationTime'] as String?;
-    speed = map['speed'] as double?;
-    altitude = map['altitude'] as double?;
-    accuracy = map['accuracy'] as double?;
-    city = map['city'] as String?;
-    cityCode = map['cityCode'] as String?;
-    country = map['country'] as String?;
-    district = map['district'] as String?;
-    province = map['province'] as String?;
-    street = map['street'] as String?;
-    streetNumber = map['streetNumber'] as String?;
-    locationType = map['locationType'] as int?;
-    formattedAddress = map['address'] as String?;
-    description = map['description'] as String?;
+    locationTime = map["locationTime"] as String?;
+    latitude = map["latitude"] as double?;
+    longitude = map["longitude"] as double?;
+    country = map["country"] as String?;
+    province = map["province"] as String?;
+    city = map["city"] as String?;
+    street = map["street"] as String?;
+    streetNumber = map["streetNumber"] as String?;
+    cityCode = map["cityCode"] as String?;
+    adCode = map["adCode"] as String?;
+    formattedAddress = map["address"] as String?;
+    description = map["description"] as String?;
+    locationType = map["locationType"] as int?;
+    accuracy = map["accuracy"] as double?;
+    altitude = map["altitude"] as double?;
+    district = map["district"] as String?;
+    speed = map["speed"] as double?;
+    bearing = map["bearing"] as double?;
     notifyListeners();
+
+    /// 定位保存到本地
+    localStorage.set('location', toMap());
   }
 
   late String? formattedAddress;
@@ -58,6 +66,7 @@ class LocationModel extends ChangeNotifier {
   late double? latitude;
   late double? longitude;
   late double? accuracy;
+  late double? bearing;
 
   ///  地址简述
   late String? description;
@@ -65,17 +74,28 @@ class LocationModel extends ChangeNotifier {
   late int? locationType;
 
   Map<String, dynamic> toMap() => {}..addAll({
-      'adCode': adCode,
-      'latitude': latitude,
-      'longitude': longitude,
-      'city': city,
-      'cityCode': cityCode,
-      'country': country,
-      'district': district,
-      'formattedAddress': formattedAddress,
-      'streetNumber': streetNumber,
-      'province': province,
-      'street': street,
-      'locationType': locationType,
+      "locationTime": locationTime,
+      "latitude": latitude,
+      "longitude": longitude,
+      "country": country,
+      "province": province,
+      "city": city,
+      "district": district,
+      "street": street,
+      "streetNumber": streetNumber,
+      "cityCode": cityCode,
+      "adCode": adCode,
+      "formattedAddress": formattedAddress,
+      "description": description,
+      "locationType": locationType,
+      "accuracy": accuracy,
+      "altitude": altitude,
+      "bearing": bearing,
+      "speed": speed,
     });
+
+  @override
+  String toString() {
+    return toMap().toString();
+  }
 }

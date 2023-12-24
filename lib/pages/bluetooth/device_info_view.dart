@@ -46,7 +46,6 @@ class _DeviceInfoViewState extends State<DeviceInfoView> {
   @override
   Widget build(BuildContext context) {
     final deviceModel = Provider.of<BluetoothDeviceModel>(context);
-    final device = deviceModel.selectedDevice;
     debugPrint('Device Info build------------');
     return SnappingBottomSheet(
       controller: controller,
@@ -68,10 +67,10 @@ class _DeviceInfoViewState extends State<DeviceInfoView> {
           if (snap == 0.0 && _isOpen) {
             _isOpen = false;
             setState(() {});
+            final deviceModel =
+                Provider.of<BluetoothDeviceModel>(context, listen: false);
             deviceModel.select(null);
-            debugPrint('Snapped to: $_isOpen');
           }
-          debugPrint('Snapped to: $snap');
         },
       ),
       liftOnScrollHeaderElevation: 12.0,
@@ -105,36 +104,51 @@ class _DeviceInfoViewState extends State<DeviceInfoView> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Text(
-                      device?.localName ?? '',
-                      style: const TextStyle(
-                          fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
-                    IconButton.filledTonal(
-                      color: Colors.white,
-                      onPressed: () {
-                        final bleModel = Provider.of<BluetoothDeviceModel>(
-                            context,
-                            listen: false);
-                        bleModel.select(null);
+                    Selector<BluetoothDeviceModel, LocalBluetoothDevice?>(
+                      selector: (_, provider) => provider.selectedDevice,
+                      builder: (_, device, __) {
+                        return Text(
+                          device?.localName ?? '',
+                          style: const TextStyle(
+                              fontSize: 18, fontWeight: FontWeight.bold),
+                        );
                       },
-                      icon: const Icon(
-                        Icons.close_outlined,
-                        color: Colors.grey,
-                        size: 16,
-                      ),
+                    ),
+                    Consumer<BluetoothDeviceModel>(
+                      builder: (_, provider, __) {
+                        return IconButton.filledTonal(
+                          color: Colors.white,
+                          onPressed: () {
+                            provider.select(null);
+                          },
+                          icon: const Icon(
+                            Icons.close_outlined,
+                            color: Colors.grey,
+                            size: 16,
+                          ),
+                        );
+                      },
                     )
                   ],
                 ),
               ),
-              Text(
-                device?.formattedAddress ?? '',
-                style: const TextStyle(fontSize: 14),
-              ),
-              const Text(
-                '1分钟前',
-                style: TextStyle(fontSize: 14),
-              ),
+              Consumer<BluetoothDeviceModel>(builder: (_, provider, __) {
+                final device = provider.selectedDevice;
+                return Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      device?.formattedAddress ?? '',
+                      style: const TextStyle(fontSize: 14),
+                    ),
+                    Text(
+                      device?.updateTime ?? '',
+                      style: const TextStyle(fontSize: 14),
+                    ),
+                  ],
+                );
+              })
             ],
           ),
         );
@@ -209,8 +223,7 @@ class _DeviceInfoViewState extends State<DeviceInfoView> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) =>
-                                DeviceFinderView(device: device!),
+                            builder: (context) => DeviceFinderView(),
                           ),
                         );
                       },

@@ -7,6 +7,7 @@ import './home/home_page.dart';
 import './community/community_view.dart';
 import './personal/personal_view.dart';
 import '../models/location_model.dart';
+import './bluetooth/crowd_net.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
@@ -48,7 +49,8 @@ class _MainPageState extends State<MainPage> {
         PageController(initialPage: _currentPageIndex, keepPage: true);
     FlutterNativeSplash.remove();
     initLocation();
-    // CrowdNet.startCrowNetwork();
+    // 开启人群网络搜索
+    CrowdNet.startCrowNetwork();
   }
 
   @override

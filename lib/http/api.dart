@@ -33,7 +33,7 @@ class Api {
   }
 
   // 更新设备定位
-  static updateLocation(data) {
+  static updateLocation(Map data) {
     return Request.post(
       "/device/updateLocation",
       data: data,

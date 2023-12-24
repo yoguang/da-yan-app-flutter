@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import '../../http/api.dart';
+import '../../utils/date_time_util.dart';
 
 class LocalBluetoothDevice extends BluetoothDevice {
   late Map? address;
@@ -27,6 +28,15 @@ class LocalBluetoothDevice extends BluetoothDevice {
 
   // 地址简化
   String get description => address?['description'];
+
+  // 定位获取时间
+  String get locationTime => address?['locationTime'];
+
+  // 更新时间
+  String get updateTime {
+    final nowTime = DateTime.now().toString();
+    return dateTimerDifferenceToString(locationTime, nowTime);
+  }
 
   formMap(Map map) {
     localName = map['name'];
