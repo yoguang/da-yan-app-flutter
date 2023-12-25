@@ -1,7 +1,7 @@
 import './request.dart';
 
 class Api {
-  // 登录
+  /// 登录
   static login(data) {
     return Request.post(
       "/user/login",
@@ -9,7 +9,7 @@ class Api {
     );
   }
 
-  // 注册账号
+  /// 注册账号
   static signup(data) {
     return Request.post(
       "/user/signup",
@@ -17,14 +17,14 @@ class Api {
     );
   }
 
-  // 获取用户已绑定设备
+  /// 获取用户已绑定设备
   static getBoundDevice() {
     return Request.get(
       "/device/getDevice",
     );
   }
 
-  // 配对连接新的设备
+  /// 配对连接新的设备
   static connect(data) {
     return Request.post(
       "/device/connect",
@@ -32,7 +32,7 @@ class Api {
     );
   }
 
-  // 更新设备定位
+  /// 更新设备定位
   static updateLocation(Map data) {
     return Request.post(
       "/device/updateLocation",
@@ -40,10 +40,28 @@ class Api {
     );
   }
 
-  // 获取标记丢失的设备
+  /// 获取标记丢失的设备
   static getLoseDevice() {
     return Request.get(
       "/device/getLoseDevice",
+    );
+  }
+
+  /// 标记丢失
+  /// {String deviceId}
+  /// {bool isLose}
+  static updateLoseStatus(Map data) {
+    return Request.put(
+      "/device/updateLoseStatus",
+      data: data,
+    );
+  }
+
+  /// {String deviceId}
+  static delete(Map data) {
+    return Request.delete(
+      "/device/delete",
+      data: data,
     );
   }
 }
