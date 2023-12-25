@@ -86,7 +86,7 @@ class CrowdNet extends WidgetsBindingObserver {
   static reportLocation(String deviceId) {
     try {
       final location = _localStorage.get('location');
-      if (location == null) return;
+      if (location == null || location['city'] == '') return;
 
       /// 发起http请求，更新设备位置
       Api.updateLocation({

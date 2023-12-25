@@ -4,7 +4,6 @@ import 'package:amap_flutter_base/amap_flutter_base.dart';
 import 'package:amap_flutter_location/amap_flutter_location.dart';
 import 'package:amap_flutter_location/amap_location_option.dart';
 import 'package:amap_flutter_map/amap_flutter_map.dart';
-import 'package:da_yan_app/utils/local_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -26,9 +25,6 @@ class _AMapViewWidgetState extends State<AMapViewWidget>
   AppLifecycleState _appLifecycleState = AppLifecycleState.resumed;
   AMapController? _mapController;
   final _locationPlugin = AMapFlutterLocation();
-  late BluetoothDeviceModel? _bluetoothDeviceModel;
-
-  static LocalStorage localStorage = LocalStorage();
 
   late LatLng _locationPosition = const LatLng(
     latitude: 39.909187,
@@ -54,8 +50,6 @@ class _AMapViewWidgetState extends State<AMapViewWidget>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    _bluetoothDeviceModel =
-        Provider.of<BluetoothDeviceModel>(context, listen: false);
     requestPermission();
     initializeLocation();
   }
@@ -63,7 +57,9 @@ class _AMapViewWidgetState extends State<AMapViewWidget>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final device = _bluetoothDeviceModel?.selectedDevice;
+    final bluetoothDeviceModel =
+        Provider.of<BluetoothDeviceModel>(context, listen: false);
+    final device = bluetoothDeviceModel.selectedDevice;
     if (device != null && _mapController != null) {
       _showDeviceInfo = true;
       updateCamera(

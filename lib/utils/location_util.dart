@@ -24,7 +24,9 @@ Map<String, dynamic> formattedDistance(latLng1, latLng2) {
   if (latLng1 == null ||
       latLng1['latitude'] == null ||
       latLng1['longitude'] == null) return {'value': 0, 'text': ''};
-  if (latLng2 == null) return {'value': 0, 'text': ''};
+  if (latLng2 == null ||
+      latLng2['latitude'] == null ||
+      latLng2['longitude'] == null) return {'value': 0, 'text': ''};
   final distanceNum = calculateDistance(latLng1['latitude'],
       latLng1['longitude'], latLng2['latitude'], latLng2['longitude']);
   // 小于1米显示在你身边

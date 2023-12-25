@@ -98,8 +98,7 @@ class _DeviceListTitleState extends State<DeviceListTitle>
       final bleModel =
           Provider.of<BluetoothDeviceModel>(context, listen: false);
       final device = widget.device;
-
-      if (locationModel.latitude == null) return;
+      if (locationModel.city!.isEmpty || locationModel.city == '') return;
       device.latitude = locationModel.latitude ?? device.latitude;
       device.longitude = locationModel.longitude ?? device.longitude;
       device.address = locationModel.toMap();
