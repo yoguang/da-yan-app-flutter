@@ -53,18 +53,18 @@ class _SignUpViewState extends State<SignUpView> {
 
     return Scaffold(
       key: scaffoldKey,
-      backgroundColor: const Color(0xFF4B39EF),
+      // backgroundColor: FlutterFlowTheme.of(context).tertiary,
       body: Container(
         width: MediaQuery.sizeOf(context).width,
         height: MediaQuery.sizeOf(context).height * 1,
         decoration: BoxDecoration(
           color: FlutterFlowTheme.of(context).tertiary,
-          image: DecorationImage(
-            fit: BoxFit.fitWidth,
-            image: Image.asset(
-              'assets/images/createAccount_BG@3x.jpg',
-            ).image,
-          ),
+          // image: DecorationImage(
+          //   fit: BoxFit.fitWidth,
+          //   image: Image.asset(
+          //     'assets/images/createAccount_BG@3x.jpg',
+          //   ).image,
+          // ),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.max,
