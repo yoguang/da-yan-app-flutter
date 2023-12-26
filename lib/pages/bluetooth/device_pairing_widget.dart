@@ -127,14 +127,14 @@ class _DevicePairingState extends State<DevicePairing> {
     final result = await Api.connect(createDevice) as Map;
     if (!result['success']) return;
     // 新增设备触发更新
-    debugPrint('createDevice----------$createDevice');
     final device = LocalBluetoothDevice(remoteId: _firstDevice.remoteId);
     createDevice['localName'] = createDevice['name'];
     device.formMap(createDevice);
     deviceModel.add(device);
     // 隐藏弹窗
-    Navigator.pop(context);
-    debugPrint('connect--------result----------');
+    if (context.mounted) {
+      Navigator.pop(context);
+    }
   }
 
   @override

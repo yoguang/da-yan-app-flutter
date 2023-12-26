@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:da_yan_app/http/api.dart';
 import 'package:da_yan_app/models/location_model.dart';
+import 'package:da_yan_app/pages/bluetooth/device_name_picker.dart';
 import 'package:da_yan_app/utils/index.dart';
 import 'package:da_yan_app/utils/location_util.dart';
 import 'package:flutter/cupertino.dart';
@@ -60,18 +61,19 @@ class _DeviceInfoViewState extends State<DeviceInfoView> {
         Provider.of<BluetoothDeviceModel>(context, listen: false);
     if (deviceModel.selectedDevice != null) {
       _isOpen = true;
-      setState(() {});
       controller.snapToExtent(0.43,
           duration: const Duration(milliseconds: 500));
     } else {
       controller.snapToExtent(0.0, duration: const Duration(milliseconds: 300));
+      _isOpen = false;
     }
+    setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
     final deviceModel = Provider.of<BluetoothDeviceModel>(context);
-    debugPrint('Device Info build------------');
+
     return SnappingBottomSheet(
       controller: controller,
       color: Colors.white,
@@ -435,6 +437,28 @@ class _DeviceInfoViewState extends State<DeviceInfoView> {
                   ),
                 ),
 
+                /// 重命名
+                Card(
+                  color: Colors.white,
+                  surfaceTintColor: Colors.white,
+                  margin: const EdgeInsets.only(top: 15),
+                  child: CupertinoListTile(
+                    padding: const EdgeInsets.only(
+                      left: 15,
+                      top: 12,
+                      right: 15,
+                      bottom: 12,
+                    ),
+                    title: const Text(
+                      '重命名',
+                      style: TextStyle(color: Colors.blue),
+                    ),
+                    onTap: () {
+                      _showNamePickerModal(context);
+                    },
+                  ),
+                ),
+
                 /// 抹掉此设备
                 Card(
                   color: Colors.white,
@@ -473,6 +497,41 @@ class _DeviceInfoViewState extends State<DeviceInfoView> {
           ),
         );
       },
+    );
+  }
+
+  /// 重命名
+  void _showNamePickerModal(BuildContext context) async {
+    await showSnappingBottomSheet(
+      context,
+      builder: (_) => SnappingBottomSheetDialog(
+        duration: const Duration(milliseconds: 500),
+        snapSpec: const SnapSpec(
+          snap: true,
+          initialSnap: SnapSpec.expanded,
+        ),
+        builder: (context, state) => Material(
+            child: Selector<BluetoothDeviceModel, BluetoothDeviceModel>(
+          selector: (_, provider) => provider,
+          builder: (_, provider, __) => DeviceNamePicker(
+              name: provider.selectedDevice?.localName,
+              onOk: (name) async {
+                try {
+                  final resp = await Api.rename({
+                    "deviceId": provider.selectedDevice?.remoteId.toString(),
+                    "name": name,
+                  });
+                  if (!resp['success']) return;
+                  // 设备重命名
+                  provider.selectedDevice?.localName = name;
+                  provider.update(provider.selectedDevice!);
+                  if (context.mounted) {
+                    Navigator.pop(context);
+                  }
+                } catch (e) {}
+              }),
+        )),
+      ),
     );
   }
 

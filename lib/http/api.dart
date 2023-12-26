@@ -57,6 +57,16 @@ class Api {
     );
   }
 
+  /// 重命名
+  /// {String deviceId}
+  /// {String name}
+  static rename(Map data) {
+    return Request.put(
+      "/device/rename",
+      data: data,
+    );
+  }
+
   /// {String deviceId}
   static delete(Map data) {
     return Request.delete(

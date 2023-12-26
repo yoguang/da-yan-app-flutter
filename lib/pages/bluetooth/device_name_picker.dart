@@ -2,8 +2,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class DeviceNamePicker extends StatefulWidget {
-  const DeviceNamePicker({super.key, required this.onOk});
+  const DeviceNamePicker({super.key, required this.onOk, this.name});
   final ValueChanged<String> onOk;
+  final String? name;
 
   @override
   State<DeviceNamePicker> createState() => _DeviceNamePickerState();
@@ -20,22 +21,52 @@ class _DeviceNamePickerState extends State<DeviceNamePicker> {
     '自定义命名',
   ];
   int _selectedIndex = 2;
-  final _nameController = TextEditingController();
+  final _nameTextEditController = TextEditingController();
+  final _scrollController = FixedExtentScrollController(
+    initialItem: 2,
+  );
+
+  /// 是否选择自定义
+  bool _isSelectedIndex5 = false;
 
   @override
   void initState() {
     super.initState();
-    _nameController.text = _deviceNames[_selectedIndex];
+    _nameTextEditController.text = _deviceNames[_selectedIndex];
   }
 
-  void handleOk(BuildContext context) {
-    widget.onOk(_nameController.text);
-    return;
+  @override
+  void didUpdateWidget(covariant DeviceNamePicker oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (_isSelectedIndex5) return;
+    if (widget.name == null) return;
+    final findIndex = _deviceNames.indexOf(widget.name as String);
+    if (findIndex > -1) {
+      _selectedIndex = findIndex;
+    } else {
+      _selectedIndex = _deviceNames.indexOf("自定义命名");
+      _isSelectedIndex5 = _selectedIndex == 5;
+    }
+    _scrollController
+        .animateToItem(
+      _selectedIndex,
+      duration: const Duration(microseconds: 1),
+      curve: Curves.bounceInOut,
+    )
+        .then((value) {
+      _nameTextEditController.text = widget.name as String;
+    });
+    setState(() {});
+  }
+
+  void handleOk() {
+    widget.onOk(_nameTextEditController.text);
   }
 
   @override
   Widget build(BuildContext context) {
-    debugPrint('_nameController: ${_nameController.text}');
+    debugPrint('_nameTextEditController: ${_nameTextEditController.text}');
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(20),
@@ -61,16 +92,17 @@ class _DeviceNamePickerState extends State<DeviceNamePicker> {
               squeeze: 1.2,
               useMagnifier: true,
               itemExtent: _kItemExtent,
-              // //设置初始项。
-              scrollController: FixedExtentScrollController(
-                initialItem: _selectedIndex,
-              ),
+              // 设置初始项。
+              scrollController: _scrollController,
               // 当所选项目更改时调用此方法。
               onSelectedItemChanged: (int selectedItem) {
-                setState(() {
-                  _selectedIndex = selectedItem;
-                  _nameController.text = _deviceNames[selectedItem];
-                });
+                _selectedIndex = selectedItem;
+                _isSelectedIndex5 = selectedItem == 5;
+                final newName = _isSelectedIndex5
+                    ? widget.name
+                    : _deviceNames[selectedItem];
+                _nameTextEditController.text = newName!;
+                setState(() {});
               },
               children: List<Widget>.generate(_deviceNames.length, (int index) {
                 return Center(child: Text(_deviceNames[index]));
@@ -83,7 +115,7 @@ class _DeviceNamePickerState extends State<DeviceNamePicker> {
               width: 300,
               height: 48,
               child: TextField(
-                controller: _nameController,
+                controller: _nameTextEditController,
               ),
             ),
           if (_selectedIndex != 5)
@@ -103,7 +135,7 @@ class _DeviceNamePickerState extends State<DeviceNamePicker> {
                   child: const Text('取消'),
                 ),
                 TextButton(
-                  onPressed: () => handleOk(context),
+                  onPressed: handleOk,
                   child: const Text('确定'),
                 ),
               ],
