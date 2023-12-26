@@ -1,7 +1,10 @@
+import 'dart:io';
+
 import 'package:amap_flutter_location/amap_flutter_location.dart';
 import 'package:amap_flutter_location/amap_location_option.dart';
 import 'package:da_yan_app/utils/fl_amap_location.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:provider/provider.dart';
 
@@ -14,6 +17,15 @@ void main() async {
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
   // initializeLocation();
+  /// 设置系统状态栏背景色
+  SystemUiOverlayStyle systemUiOverlayStyle =
+      SystemUiOverlayStyle.dark.copyWith(
+    statusBarColor: Colors.transparent,
+    systemNavigationBarColor: Colors.white,
+  );
+  SystemChrome.setSystemUIOverlayStyle(systemUiOverlayStyle);
+  SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+
   await LocalStorage.init();
   runApp(
     MultiProvider(

@@ -23,8 +23,8 @@ class _HomePageState extends State<HomePage>
   void initState() {
     super.initState();
     // 设置顶部状态栏
-    SystemChrome.setSystemUIOverlayStyle(
-        SystemUiOverlayStyle.dark.copyWith(statusBarColor: Colors.transparent));
+    // SystemChrome.setSystemUIOverlayStyle(
+    //     SystemUiOverlayStyle.dark.copyWith(statusBarColor: Colors.transparent));
     debugPrint('localStorage accessToken: ${localStorage.get('accessToken')}');
   }
 
@@ -46,6 +46,7 @@ class _HomePageState extends State<HomePage>
           ],
         ),
       ),
+      bottomNavigationBar: null,
     );
   }
 }
