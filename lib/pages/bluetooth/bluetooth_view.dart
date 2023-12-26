@@ -24,7 +24,7 @@ class _BluetoothDeviceViewState extends State<BluetoothDeviceView> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final model = Provider.of<BluetoothDeviceModel>(context, listen: false);
+    final model = Provider.of<BluetoothDeviceModel>(context, listen: true);
     if (model.selectedDevice != null) {
       controller.snapToExtent(
         0.43,
@@ -35,7 +35,6 @@ class _BluetoothDeviceViewState extends State<BluetoothDeviceView> {
 
   @override
   Widget build(BuildContext context) {
-    debugPrint('List Build------------------------------');
     return SnappingBottomSheet(
       controller: controller,
       color: Colors.white,

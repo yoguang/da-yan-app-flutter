@@ -101,6 +101,7 @@ class BluetoothDeviceModel extends ChangeNotifier {
 
   // 批量新增设备
   void addAll(List<LocalBluetoothDevice> devices) {
+    clear();
     _list.addAll(devices);
     notifyListeners();
   }
@@ -108,6 +109,12 @@ class BluetoothDeviceModel extends ChangeNotifier {
   // 删除设备
   void remove(LocalBluetoothDevice device) {
     _list.removeWhere((e) => e.remoteId == device.remoteId);
+    notifyListeners();
+  }
+
+  // 清空列表
+  void clear() {
+    _list.clear();
     notifyListeners();
   }
 

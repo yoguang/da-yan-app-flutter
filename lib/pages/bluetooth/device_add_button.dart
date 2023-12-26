@@ -32,8 +32,9 @@ class DeviceAddButton extends StatelessWidget {
         await showBottomSheetDialog(context);
       });
       return;
+    } else {
+      await showBottomSheetDialog(context);
     }
-    await showBottomSheetDialog(context);
   }
 
   @override
