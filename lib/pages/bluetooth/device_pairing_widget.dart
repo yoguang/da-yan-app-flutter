@@ -52,12 +52,9 @@ class _DevicePairingState extends State<DevicePairing> {
       // 监听搜索扫描结果
       _scanResultsSubscription = FlutterBluePlus.scanResults.listen((results) {
         List<ScanResult> filterResults = results
-            .where((ScanResult scanResult) =>
-                scanResult.rssi > -60 &&
-                !scanResult.device.isConnected &&
-                scanResult.device.platformName.isNotEmpty)
+            .where((ScanResult scanResult) => scanResult.rssi > -55)
             .toList();
-        if (filterResults.length > 0) {
+        if (filterResults.isNotEmpty) {
           FlutterBluePlus.stopScan();
         }
         debugPrint('_filterResults------------------: $filterResults');
@@ -77,11 +74,25 @@ class _DevicePairingState extends State<DevicePairing> {
   // 开始搜索
   Future onScanPressed() async {
     try {
+      final connectedDeviceList =
+          Provider.of<BluetoothDeviceModel>(context, listen: false).list;
+      final withRemoteIds = connectedDeviceList
+          .map((device) => device.remoteId.toString())
+          .toList();
+      debugPrint('withRemoteIds-------------$withRemoteIds');
       // android 在请求所有广告时速度很慢，
       // 所以我们只要求其中的 1/8
       int divisor = Platform.isAndroid ? 8 : 1;
       await FlutterBluePlus.startScan(
+          // 按广告名称过滤（完全匹配）
+          // withNames: ["iTAG"],
+          // 按广告名称过滤（匹配任何子字符串）
+          // 水滴设备广告名称iTAG后面有个空格，用此属性过滤
+          withKeywords: ["iTAG"],
+          // 过滤已知的remoteIds（iOS：128位guid，android：48位mac地址
+          withRemoteIds: withRemoteIds,
           timeout: const Duration(seconds: 60),
+          // 如果为“true”，我们将通过处理不断更新“lastSeen”和“rssi”
           continuousUpdates: true,
           continuousDivisor: divisor);
     } catch (e) {
