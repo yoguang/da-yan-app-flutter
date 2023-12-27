@@ -29,7 +29,6 @@ class DeviceAddButton extends StatelessWidget {
         final bleModel =
             Provider.of<BluetoothDeviceModel>(context, listen: false);
         bleModel.getDevice();
-        await showBottomSheetDialog(context);
       });
       return;
     } else {

@@ -16,7 +16,7 @@ import './utils/local_storage.dart';
 void main() async {
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
-  // initializeLocation();
+
   /// 设置系统状态栏背景色
   SystemUiOverlayStyle systemUiOverlayStyle =
       SystemUiOverlayStyle.dark.copyWith(
@@ -52,33 +52,4 @@ class MyApp extends StatelessWidget {
       home: const MainPage(),
     );
   }
-}
-
-Future<void> initializeLocation() async {
-  /// 动态申请定位权限
-  final hasPermission = await FlAMapLocation().requestPermission();
-
-  if (!hasPermission) return;
-  final _locationPlugin = AMapFlutterLocation();
-  AMapFlutterLocation.updatePrivacyShow(true, true);
-  AMapFlutterLocation.updatePrivacyAgree(true);
-  AMapFlutterLocation.setApiKey(
-    "44617b96965472ca5b90e8a737e963f0",
-    "f10d6b1d907e53d9e7e5e0a14a99c224",
-  );
-
-  /// 监听定位变化
-  _locationPlugin
-      .onLocationChanged()
-      .listen((Map<String, Object> location) async {
-    debugPrint('main hasPermission===========================$hasPermission');
-    debugPrint('main location===========================$location');
-  });
-
-  /// 设置10秒定位间隙
-  _locationPlugin
-      .setLocationOption(AMapLocationOption(locationInterval: 10 * 1000));
-
-  /// 开始定位
-  _locationPlugin.startLocation();
 }

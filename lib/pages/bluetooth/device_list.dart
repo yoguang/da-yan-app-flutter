@@ -54,13 +54,13 @@ class DeviceListWidget extends StatefulWidget {
 
 class _DeviceListWidgetState extends State<DeviceListWidget>
     with WidgetsBindingObserver {
-  late final BluetoothDeviceModel _bluetoothDeviceModel =
-      Provider.of(context, listen: false);
+  late final BluetoothDeviceModel _bluetoothDeviceModel;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    _bluetoothDeviceModel = Provider.of(context, listen: false);
     getDevice();
   }
 
