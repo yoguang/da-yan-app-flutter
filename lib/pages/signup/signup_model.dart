@@ -1,6 +1,7 @@
-import 'package:flutterflow_ui/flutterflow_ui.dart';
+// import 'package:flutterflow_ui/flutterflow_ui.dart';
 import 'package:flutter/material.dart';
 
+import '/common/flow_model.dart';
 import 'signup_view.dart' show SignUpView;
 
 class SignUpModel extends FlutterFlowModel<SignUpView> {

@@ -1,6 +1,14 @@
-import 'package:flutterflow_ui/flutterflow_ui.dart';
+// import 'package:flutterflow_ui/flutterflow_ui.dart';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+
+/// flutterflow_ui 的依赖copy
+import 'package:page_transition/page_transition.dart';
+import '/common/flow_model.dart';
+import '/theme/theme.dart';
+import '/widgets/ff_button.dart';
 
 import '/pages/index.dart' show MainPage;
 import '/pages/signup/signup_view.dart' show SignUpView;
@@ -43,7 +51,7 @@ class _LoginViewState extends State<LoginView> {
 
   @override
   Widget build(BuildContext context) {
-    if (isiOS) {
+    if (Platform.isIOS) {
       SystemChrome.setSystemUIOverlayStyle(
         SystemUiOverlayStyle(
           statusBarBrightness: Theme.of(context).brightness,
@@ -100,9 +108,8 @@ class _LoginViewState extends State<LoginView> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      Padding(
-                        padding:
-                            const EdgeInsetsDirectional.fromSTEB(0, 56, 0, 0),
+                      const Padding(
+                        padding: EdgeInsetsDirectional.fromSTEB(0, 56, 0, 0),
                         child: Row(
                           mainAxisSize: MainAxisSize.max,
                           children: [
@@ -131,7 +138,11 @@ class _LoginViewState extends State<LoginView> {
                           children: [
                             Text(
                               '欢迎回来,',
-                              style: FlutterFlowTheme.of(context).displaySmall,
+                              style: TextStyle(
+                                color: FlutterFlowTheme.of(context).primaryText,
+                                fontWeight: FontWeight.w600,
+                                fontSize: 36.0,
+                              ),
                             ),
                           ],
                         ),
@@ -150,11 +161,19 @@ class _LoginViewState extends State<LoginView> {
                                 obscureText: false,
                                 decoration: InputDecoration(
                                   labelText: '账号',
-                                  labelStyle:
-                                      FlutterFlowTheme.of(context).bodyMedium,
+                                  labelStyle: TextStyle(
+                                    color: FlutterFlowTheme.of(context)
+                                        .primaryText,
+                                    fontWeight: FontWeight.normal,
+                                    fontSize: 14.0,
+                                  ),
                                   hintText: '在此输入您的账号...',
-                                  hintStyle:
-                                      FlutterFlowTheme.of(context).bodyMedium,
+                                  hintStyle: TextStyle(
+                                    color: FlutterFlowTheme.of(context)
+                                        .primaryText,
+                                    fontWeight: FontWeight.normal,
+                                    fontSize: 14.0,
+                                  ),
                                   enabledBorder: OutlineInputBorder(
                                     borderSide: BorderSide(
                                       color: FlutterFlowTheme.of(context)
@@ -192,7 +211,6 @@ class _LoginViewState extends State<LoginView> {
                                       const EdgeInsetsDirectional.fromSTEB(
                                           16, 24, 0, 24),
                                 ),
-                                // style: FlutterFlowTheme.of(context).titleSmall,
                                 validator: _model
                                     .emailAddressControllerValidator
                                     .asValidator(context),
@@ -215,11 +233,19 @@ class _LoginViewState extends State<LoginView> {
                                 obscureText: !_model.passwordVisibility,
                                 decoration: InputDecoration(
                                   labelText: '密码',
-                                  labelStyle:
-                                      FlutterFlowTheme.of(context).bodyMedium,
+                                  labelStyle: TextStyle(
+                                    color: FlutterFlowTheme.of(context)
+                                        .primaryText,
+                                    fontWeight: FontWeight.normal,
+                                    fontSize: 14.0,
+                                  ),
                                   hintText: '在此输入您的密码...',
-                                  hintStyle:
-                                      FlutterFlowTheme.of(context).bodyMedium,
+                                  hintStyle: TextStyle(
+                                    color: FlutterFlowTheme.of(context)
+                                        .primaryText,
+                                    fontWeight: FontWeight.normal,
+                                    fontSize: 14.0,
+                                  ),
                                   enabledBorder: OutlineInputBorder(
                                     borderSide: BorderSide(
                                       color: FlutterFlowTheme.of(context)
@@ -271,7 +297,6 @@ class _LoginViewState extends State<LoginView> {
                                     ),
                                   ),
                                 ),
-                                // style: FlutterFlowTheme.of(context).titleSmall,
                                 validator: _model.passwordControllerValidator
                                     .asValidator(context),
                               ),
@@ -315,8 +340,8 @@ class _LoginViewState extends State<LoginView> {
                                 onPressed: () async {
                                   final result = await Api.login({
                                     'account':
-                                        _model.emailAddressController.text,
-                                    'password': _model.passwordController.text,
+                                        _model.emailAddressController?.text,
+                                    'password': _model.passwordController?.text,
                                   });
                                   if (!result['success']) return;
 
@@ -342,14 +367,11 @@ class _LoginViewState extends State<LoginView> {
                                       const EdgeInsetsDirectional.fromSTEB(
                                           0, 0, 0, 0),
                                   color: FlutterFlowTheme.of(context).primary,
-                                  textStyle: FlutterFlowTheme.of(context)
-                                      .titleMedium
-                                      .override(
-                                        fontFamily: 'Lexend Deca',
-                                        color: Colors.white,
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold,
-                                      ),
+                                  textStyle: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                   elevation: 3,
                                   borderSide: const BorderSide(
                                     color: Colors.transparent,
@@ -369,20 +391,17 @@ class _LoginViewState extends State<LoginView> {
                           mainAxisSize: MainAxisSize.max,
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Padding(
-                              padding: const EdgeInsetsDirectional.fromSTEB(
+                            const Padding(
+                              padding: EdgeInsetsDirectional.fromSTEB(
                                   20, 20, 20, 20),
                               child: Text(
                                 '没有账号?',
                                 textAlign: TextAlign.start,
-                                style: FlutterFlowTheme.of(context)
-                                    .bodyMedium
-                                    .override(
-                                      fontFamily: 'Lexend Deca',
-                                      color: const Color(0xff666666),
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.normal,
-                                    ),
+                                style: TextStyle(
+                                  color: Color(0xff666666),
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.normal,
+                                ),
                               ),
                             ),
                             FFButtonWidget(
@@ -400,7 +419,7 @@ class _LoginViewState extends State<LoginView> {
                                   ),
                                 );
                               },
-                              text: '注册',
+                              text: '去注册',
                               options: FFButtonOptions(
                                 width: 148,
                                 height: 30,
@@ -410,14 +429,11 @@ class _LoginViewState extends State<LoginView> {
                                     const EdgeInsetsDirectional.fromSTEB(
                                         0, 0, 0, 0),
                                 color: const Color(0x00FFFFFF),
-                                textStyle: FlutterFlowTheme.of(context)
-                                    .titleSmall
-                                    .override(
-                                      fontFamily: 'Lexend Deca',
-                                      color: const Color(0xFF39D2C0),
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.bold,
-                                    ),
+                                textStyle: const TextStyle(
+                                  color: Color(0xFF39D2C0),
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                ),
                                 elevation: 0,
                                 borderSide: const BorderSide(
                                   color: Colors.transparent,

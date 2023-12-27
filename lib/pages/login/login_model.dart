@@ -1,5 +1,8 @@
-import 'package:flutterflow_ui/flutterflow_ui.dart';
+// import 'package:flutterflow_ui/flutterflow_ui.dart';
 import 'package:flutter/material.dart';
+
+/// flutterflow_ui 依赖 copy
+import '/common/flow_model.dart';
 
 import 'login_view.dart' show LoginView;
 
