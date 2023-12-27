@@ -98,10 +98,13 @@ class _DeviceNamePickerState extends State<DeviceNamePicker> {
               onSelectedItemChanged: (int selectedItem) {
                 _selectedIndex = selectedItem;
                 _isSelectedIndex5 = selectedItem == 5;
-                final newName = _isSelectedIndex5
-                    ? widget.name
-                    : _deviceNames[selectedItem];
-                _nameTextEditController.text = newName!;
+                late String newName = _deviceNames[selectedItem];
+                if (widget.name != null) {
+                  newName = (_isSelectedIndex5
+                      ? widget.name
+                      : _deviceNames[selectedItem])!;
+                }
+                _nameTextEditController.text = newName;
                 setState(() {});
               },
               children: List<Widget>.generate(_deviceNames.length, (int index) {
