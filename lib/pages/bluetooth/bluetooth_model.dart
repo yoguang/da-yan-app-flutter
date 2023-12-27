@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
-import 'package:snapping_bottom_sheet/snapping_bottom_sheet.dart';
 import '../../http/api.dart';
+import '../../utils/date_time_util.dart';
 
 class LocalBluetoothDevice extends BluetoothDevice {
   late Map? address;
@@ -17,7 +17,6 @@ class LocalBluetoothDevice extends BluetoothDevice {
     if (address?['formattedAddress'] == null && address?['country'] == null) {
       return '';
     }
-    debugPrint('address------------$address');
     return address?['formattedAddress'] ??
         address?['country'] +
             address?['province'] +
@@ -27,8 +26,19 @@ class LocalBluetoothDevice extends BluetoothDevice {
             address?['poiName'];
   }
 
+  // 地址简化
+  String get description => address?['description'];
+
+  // 定位获取时间
+  String get locationTime => address?['locationTime'];
+
+  // 更新时间
+  String get updateTime {
+    final nowTime = DateTime.now().toString();
+    return dateTimerDifferenceToString(locationTime, nowTime);
+  }
+
   formMap(Map map) {
-    debugPrint('map000000000000000$map');
     localName = map['name'];
     address = map['address'];
     latitude = map['latitude'] is double
@@ -91,6 +101,7 @@ class BluetoothDeviceModel extends ChangeNotifier {
 
   // 批量新增设备
   void addAll(List<LocalBluetoothDevice> devices) {
+    clear();
     _list.addAll(devices);
     notifyListeners();
   }
@@ -98,6 +109,12 @@ class BluetoothDeviceModel extends ChangeNotifier {
   // 删除设备
   void remove(LocalBluetoothDevice device) {
     _list.removeWhere((e) => e.remoteId == device.remoteId);
+    notifyListeners();
+  }
+
+  // 清空列表
+  void clear() {
+    _list.clear();
     notifyListeners();
   }
 

@@ -1,8 +1,14 @@
 import 'dart:async';
 
+import 'package:da_yan_app/http/api.dart';
+import 'package:da_yan_app/models/location_model.dart';
+import 'package:da_yan_app/pages/bluetooth/device_name_picker.dart';
+import 'package:da_yan_app/utils/index.dart';
+import 'package:da_yan_app/utils/location_util.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
+import 'package:map_launcher/map_launcher.dart';
 import 'package:provider/provider.dart';
 import 'package:snapping_bottom_sheet/snapping_bottom_sheet.dart';
 
@@ -18,16 +24,56 @@ class DeviceInfoView extends StatefulWidget {
 }
 
 class _DeviceInfoViewState extends State<DeviceInfoView> {
+  final Map mapTypeName = {
+    "apple": "苹果地图",
+    "amap": "高德地图",
+    "baidu": "百度地图",
+    "tencent": "腾讯地图"
+  };
+
+  late List<AvailableMap> availableMaps;
   SheetController controller = SheetController();
   bool _isPlay = false;
+  bool _isOpen = false;
+
+  /// 通知开关
+  bool _notifySwitched = false;
+
+  /// 丢失开关
+  bool _loseSwitched = false;
+
+  @override
+  void initState() {
+    super.initState();
+    installedMaps();
+  }
+
+  installedMaps() async {
+    availableMaps = await MapLauncher.installedMaps;
+    debugPrint('availableMaps------------$availableMaps');
+    setState(() {});
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final deviceModel =
+        Provider.of<BluetoothDeviceModel>(context, listen: false);
+    if (deviceModel.selectedDevice != null) {
+      _isOpen = true;
+      controller.snapToExtent(0.43,
+          duration: const Duration(milliseconds: 500));
+    } else {
+      controller.snapToExtent(0.0, duration: const Duration(milliseconds: 300));
+      _isOpen = false;
+    }
+    setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {
     final deviceModel = Provider.of<BluetoothDeviceModel>(context);
-    final device = deviceModel.selectedDevice;
-    if (device == null) {
-      return const SizedBox();
-    }
+
     return SnappingBottomSheet(
       controller: controller,
       color: Colors.white,
@@ -37,16 +83,21 @@ class _DeviceInfoViewState extends State<DeviceInfoView> {
       cornerRadiusOnFullscreen: 16,
       closeOnBackdropTap: true,
       snapSpec: SnapSpec(
-        initialSnap: 0.43,
+        initialSnap: 0.0,
         snap: true,
-        positioning: SnapPositioning.relativeToAvailableSpace,
         snappings: const [
+          0.0,
           0.43,
           0.99,
         ],
         onSnap: (state, snap) {
-          deviceModel.changeSnapped(snap!);
-          debugPrint('Snapped to $snap');
+          if (snap == 0.0 && _isOpen) {
+            _isOpen = false;
+            setState(() {});
+            final deviceModel =
+                Provider.of<BluetoothDeviceModel>(context, listen: false);
+            deviceModel.select(null);
+          }
         },
       ),
       liftOnScrollHeaderElevation: 12.0,
@@ -80,36 +131,51 @@ class _DeviceInfoViewState extends State<DeviceInfoView> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Text(
-                      device!.localName,
-                      style: const TextStyle(
-                          fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
-                    IconButton.filledTonal(
-                      color: Colors.white,
-                      onPressed: () {
-                        final bleModel = Provider.of<BluetoothDeviceModel>(
-                            context,
-                            listen: false);
-                        bleModel.select(null);
+                    Selector<BluetoothDeviceModel, LocalBluetoothDevice?>(
+                      selector: (_, provider) => provider.selectedDevice,
+                      builder: (_, device, __) {
+                        return Text(
+                          device?.localName ?? '',
+                          style: const TextStyle(
+                              fontSize: 18, fontWeight: FontWeight.bold),
+                        );
                       },
-                      icon: const Icon(
-                        Icons.close_outlined,
-                        color: Colors.grey,
-                        size: 16,
-                      ),
+                    ),
+                    Consumer<BluetoothDeviceModel>(
+                      builder: (_, provider, __) {
+                        return IconButton.filledTonal(
+                          color: Colors.white,
+                          onPressed: () {
+                            provider.select(null);
+                          },
+                          icon: const Icon(
+                            Icons.close_outlined,
+                            color: Colors.grey,
+                            size: 16,
+                          ),
+                        );
+                      },
                     )
                   ],
                 ),
               ),
-              Text(
-                device.formattedAddress,
-                style: const TextStyle(fontSize: 14),
-              ),
-              const Text(
-                '1分钟前',
-                style: TextStyle(fontSize: 14),
-              ),
+              Consumer<BluetoothDeviceModel>(builder: (_, provider, __) {
+                final device = provider.selectedDevice;
+                return Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      device?.formattedAddress ?? '',
+                      style: const TextStyle(fontSize: 14),
+                    ),
+                    Text(
+                      device?.updateTime ?? '',
+                      style: const TextStyle(fontSize: 14),
+                    ),
+                  ],
+                );
+              })
             ],
           ),
         );
@@ -162,7 +228,7 @@ class _DeviceInfoViewState extends State<DeviceInfoView> {
                                 Text(
                                   '播放声音',
                                   style: TextStyle(
-                                    fontSize: 16,
+                                    fontSize: 18,
                                     fontWeight: FontWeight.bold,
                                     color: _isPlay ? Colors.white : null,
                                   ),
@@ -179,57 +245,362 @@ class _DeviceInfoViewState extends State<DeviceInfoView> {
                         ),
                       ),
                     ),
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) =>
-                                DeviceFinderView(device: device!),
-                          ),
-                        );
-                      },
-                      child: Card(
-                        color: Colors.white,
-                        shadowColor: null,
-                        surfaceTintColor: Colors.white,
-                        child: SizedBox(
-                          width: 165,
-                          height: 114,
-                          child: Padding(
-                            padding: const EdgeInsets.all(10),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Icon(
-                                  CupertinoIcons.smallcircle_fill_circle_fill,
-                                  color: Theme.of(context).primaryColor,
-                                  size: 28,
-                                ),
-                                const Padding(
-                                    padding: EdgeInsets.only(top: 18)),
-                                const Text(
-                                  '查找',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
+                    Consumer<LocationModel>(builder: (_, provider, child) {
+                      final Map latLng1 = {
+                        'latitude': provider.latitude,
+                        'longitude': provider.longitude,
+                      };
+                      final Map latLng2 = {
+                        'latitude': deviceModel.selectedDevice?.latitude,
+                        'longitude': deviceModel.selectedDevice?.longitude,
+                      };
+                      final distance = formattedDistance(
+                        latLng1,
+                        latLng2,
+                      );
+                      return GestureDetector(
+                        onTap: () {
+                          if (distance["value"] > 0.01) {
+                            _showMapActionSheet(context);
+                            return;
+                          }
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const DeviceFinderView(),
+                            ),
+                          );
+                        },
+                        child: Card(
+                          color: Colors.white,
+                          shadowColor: null,
+                          surfaceTintColor: Colors.white,
+                          child: SizedBox(
+                            width: 165,
+                            height: 114,
+                            child: Padding(
+                              padding: const EdgeInsets.all(10),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Icon(
+                                    distance["value"] > 0.01
+                                        ? CupertinoIcons
+                                            .arrow_up_right_diamond_fill
+                                        : CupertinoIcons
+                                            .smallcircle_fill_circle_fill,
+                                    color: Theme.of(context).primaryColor,
+                                    size: 28,
                                   ),
-                                ),
-                                const Text('附近'),
-                              ],
+                                  const Padding(
+                                      padding: EdgeInsets.only(top: 18)),
+                                  Text(
+                                    distance["value"] > 0.01 ? "路线" : "查找",
+                                    style: const TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  Text(distance["text"]),
+                                ],
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                    ),
+                      );
+                    }),
                   ],
                 ),
+
+                /// 通知开关
+                Card(
+                  color: Colors.white,
+                  margin: const EdgeInsets.only(top: 15),
+                  surfaceTintColor: Colors.white,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Padding(
+                        padding: EdgeInsets.only(top: 17, left: 15),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Icon(
+                              CupertinoIcons.bell_circle_fill,
+                              size: 28,
+                              color: Color(0xFFFF3D58),
+                            ),
+                            Padding(padding: EdgeInsets.only(top: 20)),
+                            Text(
+                              "通知",
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Padding(padding: EdgeInsets.only(top: 15)),
+                          ],
+                        ),
+                      ),
+                      const Divider(
+                        height: 1,
+                        color: Color(0xffe4e4e4),
+                      ),
+                      CupertinoListTile(
+                        padding: const EdgeInsets.only(
+                          left: 15,
+                          top: 12,
+                          right: 15,
+                          bottom: 12,
+                        ),
+                        title: const Text("找到时通知"),
+                        additionalInfo: CupertinoSwitch(
+                          value: _notifySwitched,
+                          onChanged: (bool switched) {
+                            _notifySwitched = !_notifySwitched;
+                            setState(() {});
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                /// 标记为丢失开关
+                Card(
+                  color: Colors.white,
+                  margin: const EdgeInsets.only(top: 15),
+                  surfaceTintColor: Colors.white,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Padding(
+                        padding: EdgeInsets.only(top: 17, left: 15),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Icon(
+                              CupertinoIcons.lock_circle_fill,
+                              size: 28,
+                              color: Color(0xFFF74738),
+                            ),
+                            Padding(padding: EdgeInsets.only(top: 15)),
+                            Text(
+                              "标记为丢失",
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Padding(padding: EdgeInsets.only(top: 20)),
+                          ],
+                        ),
+                      ),
+                      const Divider(
+                        height: 1,
+                        color: Color(0xffe4e4e4),
+                      ),
+                      CupertinoListTile(
+                        padding: const EdgeInsets.only(
+                          left: 15,
+                          top: 12,
+                          right: 15,
+                          bottom: 12,
+                        ),
+                        title: Text(
+                          _loseSwitched ? "已启用" : "启用",
+                          style: TextStyle(
+                              color: _loseSwitched ? Colors.red : Colors.blue),
+                        ),
+                        trailing: _loseSwitched
+                            ? const CupertinoListTileChevron()
+                            : null,
+                        onTap: () {
+                          _showAlertDialog(
+                            context,
+                            title: _loseSwitched ? "关闭丢失模式" : "启用丢失模式",
+                            content: "修改当前丢失状态",
+                            onPressed: () async {
+                              await Api.updateLoseStatus({
+                                "deviceId": deviceModel.selectedDevice!.remoteId
+                                    .toString(),
+                                "isLose": !_loseSwitched,
+                              });
+                              _loseSwitched = !_loseSwitched;
+                              setState(() {});
+                            },
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+
+                /// 重命名
+                Card(
+                  color: Colors.white,
+                  surfaceTintColor: Colors.white,
+                  margin: const EdgeInsets.only(top: 15),
+                  child: CupertinoListTile(
+                    padding: const EdgeInsets.only(
+                      left: 15,
+                      top: 12,
+                      right: 15,
+                      bottom: 12,
+                    ),
+                    title: const Text(
+                      '重命名',
+                      style: TextStyle(color: Colors.blue),
+                    ),
+                    onTap: () {
+                      _showNamePickerModal(context);
+                    },
+                  ),
+                ),
+
+                /// 抹掉此设备
+                Card(
+                  color: Colors.white,
+                  surfaceTintColor: Colors.white,
+                  margin: const EdgeInsets.only(top: 15),
+                  child: CupertinoListTile(
+                    padding: const EdgeInsets.only(
+                      left: 15,
+                      top: 12,
+                      right: 15,
+                      bottom: 12,
+                    ),
+                    title: const Text(
+                      "抹掉此设备",
+                      style: TextStyle(color: Colors.red),
+                    ),
+                    onTap: () {
+                      _showAlertDialog(
+                        context,
+                        title: "您确认要抹掉此设备吗？",
+                        content: "抹掉后将不再显示在你的设备列表中，请慎重选择。",
+                        onPressed: () async {
+                          await Api.delete({
+                            "deviceId":
+                                deviceModel.selectedDevice!.remoteId.toString()
+                          });
+                          deviceModel.remove(deviceModel.selectedDevice!);
+                          deviceModel.select(null);
+                        },
+                      );
+                    },
+                  ),
+                )
               ],
             ),
           ),
         );
       },
+    );
+  }
+
+  /// 重命名
+  void _showNamePickerModal(BuildContext context) async {
+    await showSnappingBottomSheet(
+      context,
+      builder: (_) => SnappingBottomSheetDialog(
+        duration: const Duration(milliseconds: 500),
+        snapSpec: const SnapSpec(
+          snap: true,
+          initialSnap: SnapSpec.expanded,
+        ),
+        builder: (context, state) => Material(
+            child: Selector<BluetoothDeviceModel, BluetoothDeviceModel>(
+          selector: (_, provider) => provider,
+          builder: (_, provider, __) => DeviceNamePicker(
+              name: provider.selectedDevice?.localName,
+              onOk: (name) async {
+                try {
+                  final resp = await Api.rename({
+                    "deviceId": provider.selectedDevice?.remoteId.toString(),
+                    "name": name,
+                  });
+                  if (!resp['success']) return;
+                  // 设备重命名
+                  provider.selectedDevice?.localName = name;
+                  provider.update(provider.selectedDevice!);
+                  if (context.mounted) {
+                    Navigator.pop(context);
+                  }
+                } catch (e) {}
+              }),
+        )),
+      ),
+    );
+  }
+
+  /// 操作确认弹窗
+  void _showAlertDialog(BuildContext context,
+      {String title = "提示", String content = "", onPressed}) {
+    showCupertinoModalPopup<void>(
+      context: context,
+      builder: (BuildContext context) => CupertinoAlertDialog(
+        title: Text(title),
+        content: Text(content),
+        actions: <CupertinoDialogAction>[
+          CupertinoDialogAction(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            child: const Text('取消'),
+          ),
+          CupertinoDialogAction(
+            onPressed: () async {
+              await onPressed();
+              if (context.mounted) {
+                Navigator.pop(context);
+              }
+            },
+            child: const Text('确认'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// 地图导航
+  void _showMapActionSheet(BuildContext context) {
+    showCupertinoModalPopup<void>(
+      context: context,
+      builder: (BuildContext context) =>
+          Selector<BluetoothDeviceModel, LocalBluetoothDevice>(
+              selector: (_, provider) => provider.selectedDevice!,
+              builder: (_, device, __) {
+                return CupertinoActionSheet(
+                  title: const Text('选择地图'),
+                  actions: availableMaps
+                      .map<CupertinoActionSheetAction>(
+                          (AvailableMap map) => CupertinoActionSheetAction(
+                                onPressed: () {
+                                  map.showDirections(
+                                    destination: Coords(
+                                      device.latitude!,
+                                      device.longitude!,
+                                    ),
+                                    destinationTitle: device.description,
+                                  );
+                                  Navigator.pop(context);
+                                },
+                                child: Text(
+                                  mapTypeName[Utils.enumToString(map.mapType)],
+                                ),
+                              ))
+                      .toList(),
+                  cancelButton: CupertinoActionSheetAction(
+                    isDestructiveAction: true,
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    child: const Text('取消'),
+                  ),
+                );
+              }),
     );
   }
 

@@ -1,12 +1,15 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 
 import './home/home_page.dart';
 import './community/community_view.dart';
 import './personal/personal_view.dart';
 import '../models/location_model.dart';
+import './bluetooth/crowd_net.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
@@ -16,6 +19,11 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
+  ///蓝牙相关API
+  BluetoothAdapterState _adapterState = BluetoothAdapterState.unknown;
+  late StreamSubscription<BluetoothAdapterState> _adapterStateStateSubscription;
+
+  /// 页面
   late PageController _pageController;
   late LocationModel _locationModel;
   int _currentPageIndex = 0;
@@ -47,14 +55,16 @@ class _MainPageState extends State<MainPage> {
     _pageController =
         PageController(initialPage: _currentPageIndex, keepPage: true);
     FlutterNativeSplash.remove();
-    initLocation();
-    // CrowdNet.startCrowNetwork();
+    initializeBluetoothAdapter();
+    // 开启人群网络搜索
+    CrowdNet.startCrowNetwork();
   }
 
   @override
   void dispose() {
     _locationModel.dispose();
     _pageController.dispose();
+    _adapterStateStateSubscription.cancel();
     super.dispose();
   }
 
@@ -82,44 +92,43 @@ class _MainPageState extends State<MainPage> {
     );
   }
 
-  Future<bool> getPermission(Permission permission) async {
-    final PermissionStatus status = await permission.request();
-    if (!status.isGranted) {
-      // await openAppSettings();
-      return await permission.request().isGranted;
-    }
-    return status.isGranted;
-  }
-
-  /// 获取定位权限
-  Future<bool> get getPermissions async {
-    if (!await getPermission(Permission.location)) {
-      return false;
-    }
-    return true;
-  }
-
-  Future<void> getLocation() async {
-    // if (!await getPermissions) return;
-    // final location = await FlAMapLocation().getLocation(true);
-    // debugPrint('getLocation===============>: ${location?.toMap()}');
-    // if (location != null) {
-    //   _locationModel.fromMap(location.toMap());
-    // }
-  }
-
-  /// 初始化定位
-  Future<void> initLocation() async {
-    // FlAMapLocation().initialize(onLocationChanged: (location) {
-    //   debugPrint('连续定位----------------------$location');
-    //   // _locationModel.fromMap(location.toMap());
-    // });
-  }
-
   void _bottomNavBarOnTap(int index) {
     setState(() {
       _currentPageIndex = index;
       _pageController.jumpToPage(index);
     });
+  }
+
+  // 初始化蓝牙适配器
+  Future initializeBluetoothAdapter() async {
+    try {
+      /// 检查设备是否支持蓝牙
+      final isSupported = await FlutterBluePlus.isSupported;
+      debugPrint('FlutterBluePlus.isSupported: $isSupported');
+      if (!isSupported) {
+        debugPrint('当前设备不支持蓝牙协议');
+        return;
+      }
+
+      final adapterStateNow = FlutterBluePlus.adapterStateNow;
+      debugPrint('FlutterBluePlus.adapterStateNow: $adapterStateNow');
+
+      /// 监听蓝牙适配器状态
+      _adapterStateStateSubscription = FlutterBluePlus.adapterState
+          .listen((BluetoothAdapterState state) async {
+        debugPrint('FlutterBluePlus.adapterState: $state');
+        if (state == BluetoothAdapterState.on) {
+          /// 尝试搜索，用以调起蓝牙授权
+          try {
+            await FlutterBluePlus.startScan();
+            FlutterBluePlus.stopScan();
+          } catch (e) {}
+        }
+        _adapterState = state;
+        setState(() {});
+      });
+    } catch (e) {
+      debugPrint('FlutterBluePlus.adapterState.listen Error: $e');
+    }
   }
 }

@@ -4,12 +4,14 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:provider/provider.dart';
+
+import 'bluetooth_model.dart';
 
 import '../../widgets/device_finder_distance_indicator.dart';
 
 class DeviceFinderView extends StatefulWidget {
-  final BluetoothDevice device;
-  const DeviceFinderView({super.key, required this.device});
+  const DeviceFinderView({super.key});
 
   @override
   State<DeviceFinderView> createState() => _DeviceFinderViewState();
@@ -46,13 +48,16 @@ class _DeviceFinderViewState extends State<DeviceFinderView> {
   }
 
   initDevice() async {
+    // 当前页面展示的前提条件就是 selectedDevice 不为空，所以不需要非空判断
+    final device = Provider.of<BluetoothDeviceModel>(context, listen: false)
+        .selectedDevice!;
     // 判断蓝牙适配器状态
     _adapterStateStateSubscription = FlutterBluePlus.adapterState
         .listen((BluetoothAdapterState state) async {
       debugPrint('adapterState===========>$state');
       if (state == BluetoothAdapterState.on) {
         // 连接蓝牙设备
-        _device.connect().catchError((e) {
+        device.connect().catchError((e) {
           debugPrint('device.connect Error: $e');
         });
       }
@@ -61,15 +66,14 @@ class _DeviceFinderViewState extends State<DeviceFinderView> {
       });
     });
     // 监听蓝牙连接状态
-    _connectionStateSubscription =
-        _device.connectionState.listen((state) async {
+    _connectionStateSubscription = device.connectionState.listen((state) async {
       debugPrint('BluetoothConnectionState: $state');
       if (state == BluetoothConnectionState.connected) {
         setState(() {
           _isConnected = true;
         });
         _getDeviceRssiTimer = Timer.periodic(const Duration(seconds: 1), (_) {
-          getDeviceRssi();
+          getDeviceRssi(device);
         });
       } else {
         setState(() {
@@ -80,9 +84,9 @@ class _DeviceFinderViewState extends State<DeviceFinderView> {
     });
   }
 
-  getDeviceRssi() async {
+  getDeviceRssi(LocalBluetoothDevice device) async {
     try {
-      final rssi = await _device.readRssi();
+      final rssi = await device.readRssi();
       int status;
       if (rssi > -60) {
         status = 2;
@@ -305,14 +309,19 @@ class _DeviceFinderViewState extends State<DeviceFinderView> {
                 ),
                 if (_isConnected)
                   Padding(
-                    padding: const EdgeInsets.only(right: 35),
-                    child: ElevatedButton(
-                      onPressed: () {
-                        _startSpeaker(widget.device);
-                      },
-                      child: const Icon(CupertinoIcons.speaker_2_fill),
-                    ),
-                  ),
+                      padding: const EdgeInsets.only(right: 35),
+                      child:
+                          Selector<BluetoothDeviceModel, LocalBluetoothDevice>(
+                        selector: (_, provider) => provider.selectedDevice!,
+                        builder: (_, device, __) {
+                          return ElevatedButton(
+                            onPressed: () {
+                              _startSpeaker(device);
+                            },
+                            child: const Icon(CupertinoIcons.speaker_2_fill),
+                          );
+                        },
+                      )),
                 if (_adapterState == BluetoothAdapterState.off)
                   Padding(
                     padding: const EdgeInsets.only(right: 35),

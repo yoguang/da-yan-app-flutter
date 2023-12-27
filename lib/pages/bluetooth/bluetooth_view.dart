@@ -5,9 +5,9 @@ import 'package:provider/provider.dart';
 import 'package:snapping_bottom_sheet/snapping_bottom_sheet.dart';
 
 import '/pages/bluetooth/device_list.dart';
-import '/pages/bluetooth/device_pairing_widget.dart';
 import '/pages/home/amap_widget.dart';
-import '/pages/login/login_view.dart';
+import 'bluetooth_model.dart';
+import 'device_add_button.dart';
 import '/utils/local_storage.dart';
 
 class BluetoothDeviceView extends StatefulWidget {
@@ -24,7 +24,7 @@ class _BluetoothDeviceViewState extends State<BluetoothDeviceView> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final model = Provider.of<BluetoothDeviceModel>(context, listen: false);
+    final model = Provider.of<BluetoothDeviceModel>(context, listen: true);
     if (model.selectedDevice != null) {
       controller.snapToExtent(
         0.43,
@@ -35,8 +35,6 @@ class _BluetoothDeviceViewState extends State<BluetoothDeviceView> {
 
   @override
   Widget build(BuildContext context) {
-    final bleModel = Provider.of<BluetoothDeviceModel>(context);
-    debugPrint('Sheet List----------------------------');
     return SnappingBottomSheet(
       controller: controller,
       color: Colors.white,
@@ -44,11 +42,11 @@ class _BluetoothDeviceViewState extends State<BluetoothDeviceView> {
       elevation: 1,
       cornerRadius: 16,
       cornerRadiusOnFullscreen: 16,
-      snapSpec: SnapSpec(
-        initialSnap: bleModel.sheetSnapped,
+      snapSpec: const SnapSpec(
+        initialSnap: 0.43,
         snap: true,
         positioning: SnapPositioning.relativeToAvailableSpace,
-        snappings: const [
+        snappings: [
           SnapSpec.headerFooterSnap,
           0.43,
           0.99,
@@ -64,25 +62,6 @@ class _BluetoothDeviceViewState extends State<BluetoothDeviceView> {
       headerBuilder: buildHeader,
       customBuilder: buildInfiniteChild,
     );
-  }
-
-  void handleAdd() async {
-    final token = localStorage.get('accessToken');
-    if (token == null) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (_) => const LoginView()),
-      ).then((isLogin) async {
-        debugPrint('isLogin------------------$isLogin');
-        if (isLogin == null) return;
-        final bleModel =
-            Provider.of<BluetoothDeviceModel>(context, listen: false);
-        bleModel.getDevice();
-        await showBottomSheetDialog(context);
-      });
-      return;
-    }
-    await showBottomSheetDialog(context);
   }
 
 // BottomSheet 头部
@@ -109,14 +88,7 @@ class _BluetoothDeviceViewState extends State<BluetoothDeviceView> {
                 '设备',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
-              IconButton(
-                onPressed: handleAdd,
-                icon: Icon(
-                  Icons.add,
-                  color: Theme.of(context).primaryColor,
-                ),
-                iconSize: 28,
-              ),
+              DeviceAddButton(),
             ],
           ),
         ],
@@ -135,61 +107,6 @@ class _BluetoothDeviceViewState extends State<BluetoothDeviceView> {
         controller: controller,
         child: const DeviceListWidget(),
       ),
-    );
-  }
-
-  Future<void> showBottomSheetDialog(BuildContext context) async {
-    await showSnappingBottomSheet(
-      context,
-      // parentBuilder: (context, sheet) {
-      //   return Theme(
-      //     data: ThemeData.dark(),
-      //     child: sheet,
-      //   );
-      // },
-      builder: (context) {
-        return SnappingBottomSheetDialog(
-          // 控制工作表状态的控制器。
-          controller: controller,
-          // 工作表的基本动画持续时间。滑动和甩动的持续时间可能不同。
-          duration: const Duration(milliseconds: 500),
-          // [SnapSpec] 定义工作表应如何对齐或是否应该对齐。
-          snapSpec: const SnapSpec(
-            snap: true,
-            initialSnap: 0.5,
-            snappings: [0.5],
-          ),
-          color: Colors.white,
-          maxWidth: double.infinity,
-          minHeight: MediaQuery.of(context).size.height / 2,
-          builder: (context, state) {
-            return Material(
-              child: Stack(
-                children: [
-                  Positioned(
-                    top: 20,
-                    right: 20,
-                    child: SizedBox(
-                      width: 32,
-                      height: 32,
-                      child: IconButton.filledTonal(
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                        icon: const Icon(
-                          Icons.close,
-                          size: 16,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const DevicePairing(),
-                ],
-              ),
-            );
-          },
-        );
-      },
     );
   }
 }

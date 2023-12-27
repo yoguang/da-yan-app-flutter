@@ -56,7 +56,8 @@ class _LoginViewState extends State<LoginView> {
 
     return Scaffold(
       key: scaffoldKey,
-      backgroundColor: const Color(0xFF4B39EF),
+      // Scaffold 本机颜色要和decoration的颜色一直，否则软键盘收回底部会出现闪烁
+      // backgroundColor: FlutterFlowTheme.of(context).tertiary,
       body: Container(
         width: MediaQuery.sizeOf(context).width,
         height: MediaQuery.sizeOf(context).height * 1,
@@ -414,7 +415,7 @@ class _LoginViewState extends State<LoginView> {
                                     .override(
                                       fontFamily: 'Lexend Deca',
                                       color: const Color(0xFF39D2C0),
-                                      fontSize: 24,
+                                      fontSize: 14,
                                       fontWeight: FontWeight.bold,
                                     ),
                                 elevation: 0,

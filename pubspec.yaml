@@ -3,7 +3,7 @@ description: "大雁APP，基于Flutter实现的一款BLE低功耗蓝牙定位�
 
 publish_to: 'none'
 
-version: 0.0.1
+version: 0.0.2
 
 environment:
   sdk: '>=3.2.0 <4.0.0'
@@ -27,6 +27,7 @@ dependencies:
   snapping_bottom_sheet: ^1.0.4
   provider: ^6.0.4
   shared_preferences: ^2.2.2
+  map_launcher: ^3.1.0
 
 dev_dependencies:
   flutter_test:

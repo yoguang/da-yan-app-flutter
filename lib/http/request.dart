@@ -6,7 +6,8 @@ import '../utils/local_storage.dart';
 class Request {
   // 配置 Dio 实例
   static final BaseOptions _options = BaseOptions(
-    baseUrl: 'http://192.168.2.103:3000',
+    // baseUrl: 'http://192.168.2.102:3000', // 本地
+    baseUrl: 'http://123.57.242.8:3000', // 生产
     connectTimeout: const Duration(minutes: 1),
     receiveTimeout: const Duration(minutes: 1),
   );
@@ -134,5 +135,13 @@ class Request {
 
   static Future<T> post<T>(String path, {Map? params, data}) {
     return _request(path, method: 'post', params: params, data: data);
+  }
+
+  static Future<T> put<T>(String path, {Map? params, data}) {
+    return _request(path, method: 'put', params: params, data: data);
+  }
+
+  static Future<T> delete<T>(String path, {Map? params, data}) {
+    return _request(path, method: 'delete', params: params, data: data);
   }
 }

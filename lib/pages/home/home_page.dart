@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter/services.dart';
 
 import '/pages/bluetooth/device_info_view.dart';
-import '/pages/bluetooth/device_pairing_widget.dart';
 import '../../utils/local_storage.dart' show LocalStorage;
 import '../bluetooth/bluetooth_view.dart' show BluetoothDeviceView;
 
@@ -23,6 +22,9 @@ class _HomePageState extends State<HomePage>
   @override
   void initState() {
     super.initState();
+    // 设置顶部状态栏
+    // SystemChrome.setSystemUIOverlayStyle(
+    //     SystemUiOverlayStyle.dark.copyWith(statusBarColor: Colors.transparent));
     debugPrint('localStorage accessToken: ${localStorage.get('accessToken')}');
   }
 
@@ -31,6 +33,7 @@ class _HomePageState extends State<HomePage>
     super.build(context);
 
     return const Scaffold(
+      backgroundColor: Colors.transparent,
       body: SafeArea(
         child: Stack(
           children: [
@@ -43,6 +46,7 @@ class _HomePageState extends State<HomePage>
           ],
         ),
       ),
+      bottomNavigationBar: null,
     );
   }
 }
