@@ -254,7 +254,7 @@ class _DeviceInfoViewState extends State<DeviceInfoView> {
                         'latitude': deviceModel.selectedDevice?.latitude,
                         'longitude': deviceModel.selectedDevice?.longitude,
                       };
-                      final distance = formattedDistance(
+                      final distance = LocationUtil.formattedDistance(
                         latLng1,
                         latLng2,
                       );

@@ -9,7 +9,7 @@ import 'package:provider/provider.dart';
 import 'bluetooth_model.dart';
 import '/http/api.dart';
 import '/models/location_model.dart';
-import '/utils/location_util.dart' show formattedDistance;
+import '/utils/location_util.dart';
 
 class Device {
   late String deviceId;
@@ -145,7 +145,7 @@ class _DeviceListTitleState extends State<DeviceListTitle>
           'latitude': widget.device.latitude,
           'longitude': widget.device.longitude
         };
-        final distance = formattedDistance(
+        final distance = LocationUtil.formattedDistance(
           latLng1,
           latLng2,
         );

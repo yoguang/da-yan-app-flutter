@@ -9,9 +9,9 @@ import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 
-import '/utils/fl_amap_location.dart';
 import '../bluetooth/bluetooth_model.dart';
 import '../../models/location_model.dart';
+import '../../common/amap_config.dart';
 
 class AMapViewWidget extends StatefulWidget {
   const AMapViewWidget({super.key});
@@ -154,8 +154,8 @@ class _AMapViewWidgetState extends State<AMapViewWidget>
     AMapFlutterLocation.updatePrivacyShow(true, true);
     AMapFlutterLocation.updatePrivacyAgree(true);
     AMapFlutterLocation.setApiKey(
-      FlAMapLocation.apiKey.androidKey.toString(),
-      FlAMapLocation.apiKey.iosKey.toString(),
+      AMapConfig.apiKey.androidKey.toString(),
+      AMapConfig.apiKey.iosKey.toString(),
     );
 
     /// 监听定位变化
@@ -221,7 +221,7 @@ class _AMapViewWidgetState extends State<AMapViewWidget>
       children: [
         Positioned(
           child: AMapWidget(
-            apiKey: FlAMapLocation.apiKey,
+            apiKey: AMapConfig.apiKey,
             touchPoiEnabled: false,
             privacyStatement: const AMapPrivacyStatement(
               hasAgree: true,
