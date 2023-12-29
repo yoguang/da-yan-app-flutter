@@ -1,8 +1,15 @@
-import 'package:da_yan_app/utils/local_storage.dart';
-import 'package:flutterflow_ui/flutterflow_ui.dart';
+// import 'package:flutterflow_ui/flutterflow_ui.dart';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+/// flutterflow_ui 依赖 copy
+import '/common/flow_model.dart';
+import '/theme/theme.dart';
+import '/widgets/ff_button.dart';
+
+import '/utils/local_storage.dart';
 import '/http/api.dart';
 import '/pages/index.dart' show MainPage;
 
@@ -42,7 +49,7 @@ class _SignUpViewState extends State<SignUpView> {
 
   @override
   Widget build(BuildContext context) {
-    if (isiOS) {
+    if (Platform.isIOS) {
       SystemChrome.setSystemUIOverlayStyle(
         SystemUiOverlayStyle(
           statusBarBrightness: Theme.of(context).brightness,
@@ -128,7 +135,11 @@ class _SignUpViewState extends State<SignUpView> {
                           children: [
                             Text(
                               '开始注册,',
-                              style: FlutterFlowTheme.of(context).displaySmall,
+                              style: TextStyle(
+                                color: FlutterFlowTheme.of(context).primaryText,
+                                fontWeight: FontWeight.w600,
+                                fontSize: 36.0,
+                              ),
                             ),
                           ],
                         ),
@@ -147,11 +158,19 @@ class _SignUpViewState extends State<SignUpView> {
                                 obscureText: false,
                                 decoration: InputDecoration(
                                   labelText: '账号',
-                                  labelStyle:
-                                      FlutterFlowTheme.of(context).bodyMedium,
+                                  labelStyle: TextStyle(
+                                    color: FlutterFlowTheme.of(context)
+                                        .primaryText,
+                                    fontWeight: FontWeight.normal,
+                                    fontSize: 14.0,
+                                  ),
                                   hintText: '在此输入您的账号...',
-                                  hintStyle:
-                                      FlutterFlowTheme.of(context).bodyMedium,
+                                  hintStyle: TextStyle(
+                                    color: FlutterFlowTheme.of(context)
+                                        .primaryText,
+                                    fontWeight: FontWeight.normal,
+                                    fontSize: 14.0,
+                                  ),
                                   enabledBorder: OutlineInputBorder(
                                     borderSide: const BorderSide(
                                       color: Color(0xFFE0E3E7),
@@ -187,7 +206,12 @@ class _SignUpViewState extends State<SignUpView> {
                                       const EdgeInsetsDirectional.fromSTEB(
                                           16, 24, 0, 24),
                                 ),
-                                style: FlutterFlowTheme.of(context).bodySmall,
+                                style: TextStyle(
+                                  color:
+                                      FlutterFlowTheme.of(context).primaryText,
+                                  fontWeight: FontWeight.normal,
+                                  fontSize: 12.0,
+                                ),
                                 validator: _model
                                     .emailAddressControllerValidator
                                     .asValidator(context),
@@ -210,11 +234,19 @@ class _SignUpViewState extends State<SignUpView> {
                                 obscureText: !_model.passwordVisibility,
                                 decoration: InputDecoration(
                                   labelText: '密码',
-                                  labelStyle:
-                                      FlutterFlowTheme.of(context).bodyMedium,
+                                  labelStyle: TextStyle(
+                                    color: FlutterFlowTheme.of(context)
+                                        .primaryText,
+                                    fontWeight: FontWeight.normal,
+                                    fontSize: 14.0,
+                                  ),
                                   hintText: '在此输入你的密码...',
-                                  hintStyle:
-                                      FlutterFlowTheme.of(context).bodyMedium,
+                                  hintStyle: TextStyle(
+                                    color: FlutterFlowTheme.of(context)
+                                        .primaryText,
+                                    fontWeight: FontWeight.normal,
+                                    fontSize: 14.0,
+                                  ),
                                   enabledBorder: OutlineInputBorder(
                                     borderSide: BorderSide(
                                       color: FlutterFlowTheme.of(context)
@@ -266,7 +298,12 @@ class _SignUpViewState extends State<SignUpView> {
                                     ),
                                   ),
                                 ),
-                                style: FlutterFlowTheme.of(context).bodySmall,
+                                style: TextStyle(
+                                  color:
+                                      FlutterFlowTheme.of(context).primaryText,
+                                  fontWeight: FontWeight.normal,
+                                  fontSize: 12.0,
+                                ),
                                 validator: _model.passwordControllerValidator
                                     .asValidator(context),
                               ),
@@ -288,8 +325,8 @@ class _SignUpViewState extends State<SignUpView> {
                                 onPressed: () async {
                                   final result = await Api.signup({
                                     'account':
-                                        _model.emailAddressController.text,
-                                    'password': _model.passwordController.text,
+                                        _model.emailAddressController?.text,
+                                    'password': _model.passwordController?.text,
                                   });
                                   if (!result['success']) return;
 
@@ -321,14 +358,11 @@ class _SignUpViewState extends State<SignUpView> {
                                       const EdgeInsetsDirectional.fromSTEB(
                                           0, 0, 0, 0),
                                   color: FlutterFlowTheme.of(context).primary,
-                                  textStyle: FlutterFlowTheme.of(context)
-                                      .titleMedium
-                                      .override(
-                                        fontFamily: 'Lexend Deca',
-                                        color: Colors.white,
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold,
-                                      ),
+                                  textStyle: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                   elevation: 3,
                                   borderSide: const BorderSide(
                                     color: Colors.transparent,
@@ -353,7 +387,12 @@ class _SignUpViewState extends State<SignUpView> {
                                   20, 0, 0, 0),
                               child: Text(
                                 '已有账号?',
-                                style: FlutterFlowTheme.of(context).bodyMedium,
+                                style: TextStyle(
+                                  color:
+                                      FlutterFlowTheme.of(context).primaryText,
+                                  fontWeight: FontWeight.normal,
+                                  fontSize: 14.0,
+                                ),
                               ),
                             ),
                             FFButtonWidget(
@@ -371,14 +410,11 @@ class _SignUpViewState extends State<SignUpView> {
                                     const EdgeInsetsDirectional.fromSTEB(
                                         0, 0, 0, 0),
                                 color: const Color(0x00FFFFFF),
-                                textStyle: FlutterFlowTheme.of(context)
-                                    .titleSmall
-                                    .override(
-                                      fontFamily: 'Lexend Deca',
-                                      color: const Color(0xFF39D2C0),
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.bold,
-                                    ),
+                                textStyle: const TextStyle(
+                                  color: Color(0xFF39D2C0),
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                ),
                                 elevation: 0,
                                 borderSide: const BorderSide(
                                   color: Colors.transparent,

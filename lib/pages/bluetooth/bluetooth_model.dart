@@ -35,7 +35,7 @@ class LocalBluetoothDevice extends BluetoothDevice {
   // 更新时间
   String get updateTime {
     final nowTime = DateTime.now().toString();
-    return dateTimerDifferenceToString(locationTime, nowTime);
+    return DateTimeUtil.dateTimerDifferenceToString(locationTime, nowTime);
   }
 
   formMap(Map map) {

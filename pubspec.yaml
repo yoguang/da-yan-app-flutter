@@ -13,7 +13,6 @@ dependencies:
     sdk: flutter
 
   cupertino_icons: ^1.0.2
-  flutterflow_ui: ^0.2.0+1
   amap_flutter_map:
     path: /Users/wyg/Flutter/flutter_plugins/amap_flutter_map
   amap_flutter_base:
@@ -28,6 +27,10 @@ dependencies:
   provider: ^6.0.4
   shared_preferences: ^2.2.2
   map_launcher: ^3.1.0
+  font_awesome_flutter: ^10.1.0
+  auto_size_text: ^3.0.0
+  collection: ^1.18.0
+  page_transition: ^2.0.4
 
 dev_dependencies:
   flutter_test:
