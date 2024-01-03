@@ -90,14 +90,28 @@ class _AMapViewWidgetState extends State<AMapViewWidget>
   void updateLocationModel(Map<String, dynamic> location) {
     final model = Provider.of<LocationModel>(context, listen: false);
     model.fromMap(location);
+
+    // 创建我的定位Marker
+    Marker marker = Marker(
+      position: LatLng(
+        latitude: location["latitude"],
+        longitude: location["longitude"],
+      ),
+      anchor: const Offset(0.5, 0.5),
+      icon: BitmapDescriptor.fromIconPath('assets/markers/location_marker.png'),
+    );
+    _initMarkerMap['MyLocation'] = marker;
+    setState(() {});
   }
 
   /// 初始化我的位置以及地图中心
   void initialCameraPosition(Map location) {
     if (_isLocationInitial) return;
     _isLocationInitial = true;
-    final latitude = location['latitude'] as double;
-    final longitude = location['longitude'] as double;
+    final latitude =
+        LocationModel.numberStringToDouble(location['latitude']) as double;
+    final longitude =
+        LocationModel.numberStringToDouble(location['longitude']) as double;
     final target = LatLng(
       latitude: latitude,
       longitude: longitude,
@@ -217,12 +231,15 @@ class _AMapViewWidgetState extends State<AMapViewWidget>
         _initMarkerMap[device.remoteId.toString()] = marker;
       }
     }
+
     return Stack(
       children: [
         Positioned(
           child: AMapWidget(
             apiKey: AMapConfig.apiKey,
             touchPoiEnabled: false,
+            compassEnabled: true,
+            gestureScaleByMapCenter: true,
             privacyStatement: const AMapPrivacyStatement(
               hasAgree: true,
               hasContains: true,
@@ -244,8 +261,8 @@ class _AMapViewWidgetState extends State<AMapViewWidget>
           ),
         ),
         Positioned(
-          top: 40,
-          right: 20,
+          top: MediaQuery.of(context).size.height / 2 - 80,
+          right: 10,
           child: FloatingActionButton(
             backgroundColor: Colors.white,
             onPressed: () async {
@@ -283,7 +300,7 @@ class _AMapViewWidgetState extends State<AMapViewWidget>
       builder: (BuildContext context) => CupertinoAlertDialog(
         title: const Text('定位权限'),
         content: const Text(
-          '前往设置打开定位权限，已获取更好的体验。',
+          '前往设置打开定位权限，以获取更好的体验。',
           style: TextStyle(fontSize: 16),
         ),
         actions: <CupertinoDialogAction>[
