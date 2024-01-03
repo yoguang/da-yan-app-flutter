@@ -27,8 +27,8 @@ class LocationModel extends ChangeNotifier {
 
   void fromMap(Map<String, dynamic> map) {
     locationTime = map["locationTime"] as String?;
-    latitude = map["latitude"] as double?;
-    longitude = map["longitude"] as double?;
+    latitude = numberStringToDouble(map["latitude"]) as double?;
+    longitude = numberStringToDouble(map["longitude"]) as double?;
     country = map["country"] as String?;
     province = map["province"] as String?;
     city = map["city"] as String?;
@@ -39,11 +39,11 @@ class LocationModel extends ChangeNotifier {
     formattedAddress = map["address"] as String?;
     description = map["description"] as String?;
     locationType = map["locationType"] as int?;
-    accuracy = map["accuracy"] as double?;
-    altitude = map["altitude"] as double?;
+    accuracy = numberStringToDouble(map["accuracy"]) as double?;
+    altitude = numberStringToDouble(map["altitude"]) as double?;
     district = map["district"] as String?;
-    speed = map["speed"] as double?;
-    bearing = map["bearing"] as double?;
+    speed = numberStringToDouble(map["speed"]) as double?;
+    bearing = numberStringToDouble(map["bearing"]) as double?;
     notifyListeners();
 
     /// 定位保存到本地
@@ -97,5 +97,15 @@ class LocationModel extends ChangeNotifier {
   @override
   String toString() {
     return toMap().toString();
+  }
+
+  static numberStringToDouble(dynamic value) {
+    if (value == null) {
+      return null;
+    }
+    if (value is String) {
+      return double.parse(value);
+    }
+    return value;
   }
 }
