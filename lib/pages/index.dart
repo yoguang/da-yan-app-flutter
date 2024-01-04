@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
@@ -56,8 +57,6 @@ class _MainPageState extends State<MainPage> {
         PageController(initialPage: _currentPageIndex, keepPage: true);
     FlutterNativeSplash.remove();
     initializeBluetoothAdapter();
-    // 开启人群网络搜索
-    CrowdNet.startCrowNetwork();
   }
 
   @override
@@ -117,18 +116,62 @@ class _MainPageState extends State<MainPage> {
       _adapterStateStateSubscription = FlutterBluePlus.adapterState
           .listen((BluetoothAdapterState state) async {
         debugPrint('FlutterBluePlus.adapterState: $state');
-        if (state == BluetoothAdapterState.on) {
-          /// 尝试搜索，用以调起蓝牙授权
-          try {
-            await FlutterBluePlus.startScan();
-            FlutterBluePlus.stopScan();
-          } catch (e) {}
+        if (state == BluetoothAdapterState.off) {
+          if (context.mounted) {
+            _showAlertDialog(context);
+          }
+          return;
         }
+
+        if (state == BluetoothAdapterState.on) {
+          /// 开启人群网络搜索
+          CrowdNet.startCrowNetwork();
+        }
+
         _adapterState = state;
         setState(() {});
       });
     } catch (e) {
       debugPrint('FlutterBluePlus.adapterState.listen Error: $e');
     }
+  }
+
+  void _showAlertDialog(BuildContext context) {
+    showCupertinoModalPopup<void>(
+      context: context,
+      builder: (BuildContext context) => CupertinoAlertDialog(
+        title: const Text("蓝牙未开启"),
+        content: const Text(
+          "请打开蓝牙，以获取完整功能。",
+          style: TextStyle(fontSize: 16),
+        ),
+        actions: <CupertinoDialogAction>[
+          CupertinoDialogAction(
+            isDefaultAction: true,
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            child: const Text(
+              '暂不开启',
+              style: TextStyle(color: Colors.grey),
+            ),
+          ),
+          CupertinoDialogAction(
+            isDestructiveAction: true,
+            onPressed: () {
+              Navigator.pop(context);
+              Timer(const Duration(milliseconds: 60), () {
+                /// 打开蓝牙开关
+                FlutterBluePlus.turnOn();
+              });
+            },
+            child: const Text(
+              '打开',
+              style: TextStyle(color: Colors.blue),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
