@@ -15,6 +15,13 @@ For help getting started with Flutter development, view the
 [online documentation](https://docs.flutter.dev/), which offers tutorials,
 samples, guidance on mobile development, and a full API reference.
 
+## 打包
+
+> 分平台打包 armeabi-v7a、arm64-v8a、x86_64
+```bash
+flutter build apk --split-per-abi
+```
+
 ## 启动图标设置
 
 > 安装 flutter_launcher_icons 插件

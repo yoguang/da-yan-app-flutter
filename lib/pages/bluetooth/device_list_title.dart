@@ -75,6 +75,9 @@ class _DeviceListTitleState extends State<DeviceListTitle>
     _connectionStateSubscription =
         widget.device.connectionState.listen((state) {
       if (state == BluetoothConnectionState.connected) {
+        if (widget.device.isLose) {
+          showModalPopup(context, widget.device);
+        }
         updateLocation();
       }
       _connectionState = state;
@@ -129,8 +132,14 @@ class _DeviceListTitleState extends State<DeviceListTitle>
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      leading: const CircleAvatar(
-        child: Icon(Icons.bluetooth),
+      leading: CircleAvatar(
+        child: widget.device.isLose
+            ? const Icon(
+                CupertinoIcons.lock_circle_fill,
+                size: 28,
+                color: Color(0xFFF74738),
+              )
+            : const Icon(Icons.bluetooth),
       ),
       title: Text(widget.device.localName),
       subtitle:
@@ -159,6 +168,70 @@ class _DeviceListTitleState extends State<DeviceListTitle>
     );
   }
 
+  /// CrowdNet 更新通知提醒
+  void showAlertDialog(BuildContext context, LocalBluetoothDevice device) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        action: SnackBarAction(
+          label: "知道了",
+          onPressed: () {
+            // Code to execute.
+          },
+        ),
+        content: Padding(
+          padding: const EdgeInsets.only(left: 10),
+          child: Text("${device.localName} 位置已于 ${device.locationTime} 更新"),
+        ),
+        duration: const Duration(milliseconds: 1000 * 10),
+        padding: const EdgeInsets.symmetric(
+          horizontal: 8.0, // Inner padding for SnackBar content.
+        ),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10.0),
+        ),
+      ),
+    );
+  }
+
+  /// 已找到弹窗
+  void showModalPopup(BuildContext context, LocalBluetoothDevice device) {
+    showCupertinoModalPopup<void>(
+      context: context,
+      builder: (BuildContext context) => CupertinoAlertDialog(
+        title: Text("${device.localName} 已找到"),
+        content: const Text("已找到该设备，在附近走动找找看"),
+        actions: <CupertinoDialogAction>[
+          // CupertinoDialogAction(
+          //   isDefaultAction: true,
+          //   onPressed: () {
+          //     Navigator.pop(context);
+          //   },
+          //   child: const Text(
+          //     '取消',
+          //     style: TextStyle(color: Colors.grey),
+          //   ),
+          // ),
+          CupertinoDialogAction(
+            isDestructiveAction: true,
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            child: const Text(
+              "确认",
+              style: TextStyle(color: Colors.blue),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// 请求 CrowdNet 更新
+  void requestCrowdNetUpdate(LocalBluetoothDevice device) {
+    if (!device.isLose) return;
+  }
+
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
@@ -175,6 +248,8 @@ class _DeviceListTitleState extends State<DeviceListTitle>
         // 应用程序处于可见状态，并且可以响应用户的输入事件。它相当于 Android 中Activity的onResume。
         if (_connectionState == BluetoothConnectionState.connected) {
           updateLocation();
+        } else {
+          connect();
         }
         break;
       case AppLifecycleState.detached:

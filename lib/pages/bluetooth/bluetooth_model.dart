@@ -8,6 +8,7 @@ class LocalBluetoothDevice extends BluetoothDevice {
   late double? latitude;
   late double? longitude;
   LocalBluetoothDevice({required super.remoteId});
+  late bool isLose = false;
 
   @override
   late String localName = '';
@@ -47,6 +48,7 @@ class LocalBluetoothDevice extends BluetoothDevice {
     longitude = map['longitude'] is double
         ? map['longitude']
         : double.parse(map['longitude']);
+    isLose = map['isLose'];
   }
 
   Map<String, dynamic> toMap() {
@@ -55,6 +57,7 @@ class LocalBluetoothDevice extends BluetoothDevice {
     data['address'] = address;
     data['latitude'] = latitude;
     data['longitude'] = longitude;
+    data['isLose'] = isLose;
     return data;
   }
 
@@ -67,6 +70,7 @@ class LocalBluetoothDevice extends BluetoothDevice {
         'address: $address, '
         'latitude: $latitude, '
         'longitude: $longitude, '
+        'isLose: $isLose'
         '}';
   }
 }

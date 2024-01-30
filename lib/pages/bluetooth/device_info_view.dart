@@ -61,6 +61,7 @@ class _DeviceInfoViewState extends State<DeviceInfoView> {
         Provider.of<BluetoothDeviceModel>(context, listen: false);
     if (deviceModel.selectedDevice != null) {
       _isOpen = true;
+      _loseSwitched = deviceModel.selectedDevice!.isLose;
       controller.snapToExtent(0.43,
           duration: const Duration(milliseconds: 500));
     } else {
@@ -422,13 +423,15 @@ class _DeviceInfoViewState extends State<DeviceInfoView> {
                             title: _loseSwitched ? "关闭丢失模式" : "启用丢失模式",
                             content: "修改当前丢失状态",
                             onPressed: () async {
+                              final device = deviceModel.selectedDevice;
                               await Api.updateLoseStatus({
-                                "deviceId": deviceModel.selectedDevice!.remoteId
-                                    .toString(),
+                                "deviceId": device!.remoteId.toString(),
                                 "isLose": !_loseSwitched,
                               });
                               _loseSwitched = !_loseSwitched;
                               setState(() {});
+                              device.isLose = _loseSwitched;
+                              deviceModel.update(device);
                             },
                           );
                         },
