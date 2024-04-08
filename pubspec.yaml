@@ -14,11 +14,17 @@ dependencies:
 
   cupertino_icons: ^1.0.2
   amap_flutter_map:
-    path: /Users/wyg/Flutter/flutter_plugins/amap_flutter_map
+    git:
+      url: https://github.com/yoguang/amap_flutter_map
+      branch: main
   amap_flutter_base:
-    path: /Users/wyg/Flutter/flutter_plugins/amap_flutter_base
+    git:
+      url: https://github.com/yoguang/amap_flutter_base
+      branch: main
   amap_flutter_location:
-     path: /Users/wyg/Flutter/flutter_plugins/amap_flutter_location
+     git:
+      url: https://github.com/yoguang/amap_flutter_location
+      branch: main
   permission_handler: ^11.2.0
   flutter_blue_plus: ^1.30.3
   dio: ^5.4.0
