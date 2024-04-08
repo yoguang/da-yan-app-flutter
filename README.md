@@ -1,19 +1,14 @@
 # 大雁APP
 
-基于Flutter实现的一款BLE低功耗蓝牙定位查找应用程序。
+基于Flutter实现的一款BLE低功耗蓝牙定位查找应用程序。集成高德SDK，实现地图显示，以及定位功能。
 
-## Getting Started
+## Flutter 入门
 
-This project is a starting point for a Flutter application.
+如果这是你的第一个Flutter项目，有一些资源可以帮助你开始：
+- [编写你的第一个Flutter应用](https://flutter.cn/docs/get-started/codelab)
+- [有用的Flutter样本](https://docs.flutter.dev/cookbook)
 
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+有关Flutter开发入门的帮助，请查看 [在线文档](https://flutter.cn/docs), 提供教程， 示例、移动的开发指南和完整的API参考。
 
 ## 打包
 
