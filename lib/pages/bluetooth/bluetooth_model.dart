@@ -48,7 +48,7 @@ class LocalBluetoothDevice extends BluetoothDevice {
     longitude = map['longitude'] is double
         ? map['longitude']
         : double.parse(map['longitude']);
-    isLose = map['isLose'];
+    isLose = map['isLose'] is bool ? map['isLose'] : false;
   }
 
   Map<String, dynamic> toMap() {
